@@ -1,0 +1,2 @@
+{:nomad/private-file #nomad/file "resources/local.edn"
+ :slack-start-url "https://slack.com/api/rtm.start"}
