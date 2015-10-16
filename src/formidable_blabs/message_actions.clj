@@ -1,7 +1,9 @@
 (ns formidable-blabs.message-actions
-  (:require [clojure.core.async :as async :refer [go >!]]
+  (:require [clojure.edn :as edn]
+            [clojure.core.async :as async :refer [go >!]]
             [clojure.core.match :as match :refer [match]]
             [clojure.core.match.regex :refer :all]
+            [clojure.java.io :as io]
             [formidable-blabs.channels :refer [outbound-channel]]
             [taoensso.timbre :as log]))
 
@@ -26,26 +28,31 @@
 ;; !darkglasses
 ;; Hello / goodbye
 
-(defn tableflip
-  [message]
-  (log/debug "Got a tableflip! Flipping tabble!")
-  (let [flips ["one" "two" "three"]
+(defn random-emote-by-key
+  [k message emotes]
+  (let [flips (k emotes)
+        flip (rand-nth flips)
         to-chan (:channel message)]
-    (go (>! outbound-channel [to-chan (rand-nth flips)]))))
+    (go (>! outbound-channel [to-chan flip]))))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
 ;; string_ matches.
 
+(defn load-emotes []
+  (edn/read-string (slurp (io/resource "emotes.edn") :encoding "utf-16")))
+
 (defn message-dispatch
   ""
-  [{:keys [user channel text] :as message}]
-  (match [user channel text]
-         [_ _ #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
-         [_ _ #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
-         [_ _ #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
-         [_ _ #"!wat\s*"] (log/debug "'!wat' not yet implemented")
-         [_ _ #"!welp\s*"] (log/debug "'!welp' not yet implemented")
-         [_ _ #"!nope\s*"] (log/debug "'!nope' not yet implemented")
-         [_ _ #"!tableflip\s*"] (tableflip message)
-         :else (log/debug "No message action found.")))
+  [{:keys [user channel text] :as message :or {text "" user "" channel ""}}]
+  (log/debug message)
+  (let [emotes (load-emotes)]
+    (match [user channel text]
+           [_ _ #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
+           [_ _ #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
+           [_ _ #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
+           [_ _ #"!wat\s*"] (random-emote-by-key :wat message emotes)
+           [_ _ #"!welp\s*"] (random-emote-by-key :welp message emotes)
+           [_ _ #"!nope\s*"] (random-emote-by-key :nope message emotes)
+           [_ _ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
+           :else (log/debug "No message action found."))))
