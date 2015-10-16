@@ -9,7 +9,8 @@
                  [aleph "0.4.0"]
                  [manifold "0.1.1"]
                  [com.taoensso/timbre "4.1.4"]
-                 [org.clojure/core.match "0.3.0-alpha4"]]
+                 [org.clojure/core.match "0.3.0-alpha4"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
   :main ^:skip-aot formidable-blabs.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
