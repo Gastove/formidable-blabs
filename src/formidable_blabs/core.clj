@@ -56,7 +56,7 @@
     (dispatch body)
     (if-let [next-item (async/<! in-ch)]
       (recur next-item)
-      (log/debug "Got nil, exiting."))))
+      (log/debug "Got nil on in-ch, exiting."))))
 
 (defn tryit []
   "Opens a connection to slack and starts running the whole works.
@@ -69,7 +69,7 @@
       (send! outgoing sock)
       (if-let [next-item (async/<! outbound-channel)]
         (recur next-item)
-        (log/debug "Got nil, exiting.")))
+        (log/debug "Got nil on outbound channel, exiting.")))
     (fn [] (m/close! sock) (async/close! ch) (async/close! outbound-channel))))
 
 (defn -main
@@ -80,5 +80,6 @@
     (consume-and-dispatch ch)
     (async/go-loop [outgoing (async/<! outbound-channel)]
       (send! outgoing sock)
-      (recur (async/<! outbound-channel))))
+      (if-let [next-item (async/<! outbound-channel)]
+        (recur next-item))))
   (log/info "We're up!"))
