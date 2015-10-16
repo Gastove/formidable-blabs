@@ -54,7 +54,9 @@
 (defn consume-and-dispatch [in-ch]
   (async/go-loop [body (async/<! in-ch)]
     (dispatch body)
-    (recur (async/<! in-ch))))
+    (if-let [next-item (async/<! in-ch)]
+      (recur next-item)
+      (log/debug "Got nil, exiting."))))
 
 (defn tryit []
   "Opens a connection to slack and starts running the whole works.
@@ -65,10 +67,18 @@
     (consume-and-dispatch ch)
     (async/go-loop [outgoing (async/<! outbound-channel)]
       (send! outgoing sock)
-      (recur (async/<! outbound-channel)))
+      (if-let [next-item (async/<! outbound-channel)]
+        (recur next-item)
+        (log/debug "Got nil, exiting.")))
     (fn [] (m/close! sock) (async/close! ch) (async/close! outbound-channel))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (let [[sock ch] (connect-to-slack)
+        send! (make-message-sender)]
+    (consume-and-dispatch ch)
+    (async/go-loop [outgoing (async/<! outbound-channel)]
+      (send! outgoing sock)
+      (recur (async/<! outbound-channel))))
+  (log/info "We're up!"))
