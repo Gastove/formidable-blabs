@@ -81,5 +81,5 @@
            [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
            [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
-           [_ #"[omf?g ]+\s*"] (omg-responder message emotes)
+           [_ #"(?i)[omf?g ]+\s*"] (omg-responder message emotes)
            :else (log/debug "No message action found."))))
