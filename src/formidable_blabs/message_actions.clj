@@ -57,21 +57,20 @@
               (log/debug "It's time! Actioning"))
           (log/info "Not performing action yet, too soon"))))))
 
+(defn load-emotes []
+  (edn/read-string (slurp (io/resource "emotes.edn") :encoding "utf-16")))
+
 (defn get-rate-limit [k]
   (let [emotes (load-emotes)
         rates (:rate-limits emotes)]
     (get rates k 10)))
 
 (def omg-responder (make-throttled-responder (partial random-emote-by-key :omg) (get-rate-limit :omg)))
-(def oop-responder (make-throttled-responder (partial random-emote-by-key :oops) (get-rate-limit :oops)))
+(def oops-responder (make-throttled-responder (partial random-emote-by-key :oops) (get-rate-limit :oops)))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
 ;; string_ matches.
-
-(defn load-emotes []
-  (edn/read-string (slurp (io/resource "emotes.edn") :encoding "utf-16")))
-
 (defn message-dispatch
   ""
   [{:keys [user text] :as message :or {text "" user ""}}]
