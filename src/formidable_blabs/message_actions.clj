@@ -53,12 +53,12 @@
   [{:keys [user channel text] :as message :or {text "" user "" channel ""}}]
   (log/debug message)
   (let [emotes (load-emotes)]
-    (match [user channel text]
-           [_ _ #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
-           [_ _ #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
-           [_ _ #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
-           [_ _ #"!wat\s*"] (random-emote-by-key :wat message emotes)
-           [_ _ #"!welp\s*"] (random-emote-by-key :welp message emotes)
-           [_ _ #"!nope\s*"] (random-emote-by-key :nope message emotes)
-           [_ _ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
+    (match [user text]
+           [_  #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
+           [_  #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
+           [_  #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
+           [_  #"!wat\s*"] (random-emote-by-key :wat message emotes)
+           [_  #"!welp\s*"] (random-emote-by-key :welp message emotes)
+           [_  #"!nope\s*"] (random-emote-by-key :nope message emotes)
+           [_  #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
            :else (log/debug "No message action found."))))
