@@ -42,6 +42,9 @@
                  :channel to-chan}]
     (go (>! outbound-channel out-msg))))
 
+;; ### Rate Limits
+;; Some things shouldn't run all the time. This wrapper makes a function get
+;; called no more than every throttle-seconds seconds.
 (defn make-throttled-responder
   "Not every response should happen every time."
   [action throttle-seconds]
@@ -60,6 +63,7 @@
     (get rates k 10)))
 
 (def omg-responder (make-throttled-responder (partial random-emote-by-key :omg) (get-rate-limit :omg)))
+(def oop-responder (make-throttled-responder (partial random-emote-by-key :oops) (get-rate-limit :oops)))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
@@ -82,4 +86,5 @@
            [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
            [_ #"(?i)[omf?g ]+\s*"] (omg-responder message emotes)
+           [_ #"(?i)[wh]?oops|uh-oh"] (oops-responder message emotes)
            :else (log/debug "No message action found."))))
