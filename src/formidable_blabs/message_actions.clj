@@ -54,11 +54,11 @@
   (log/debug message)
   (let [emotes (load-emotes)]
     (match [user text]
-           [_  #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
-           [_  #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
-           [_  #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
-           [_  #"!wat\s*"] (random-emote-by-key :wat message emotes)
-           [_  #"!welp\s*"] (random-emote-by-key :welp message emotes)
-           [_  #"!nope\s*"] (random-emote-by-key :nope message emotes)
-           [_  #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
+           [_ #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
+           [_ #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
+           [_ #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
+           [_ #"!wat\s*"] (random-emote-by-key :wat message emotes)
+           [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
+           [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
+           [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
            :else (log/debug "No message action found."))))
