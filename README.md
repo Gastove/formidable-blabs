@@ -1,36 +1,29 @@
 # formidable-blabs
 
-FIXME: description
+I'm a slack bot! At the moment, I'm not a super good one. Stay tuned.
 
 ## Installation
 
-Download from http://example.com/FIXME.
+The only thing you need is a recent installation of [Leiningen](http://leiningen.org/).
 
 ## Usage
 
-FIXME: explanation
+You'll need a Slack Bot Integration token for the Slack team blabs is meant to
+join.
 
-    $ java -jar formidable-blabs-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
+```bash
+git clone https://github.com/Gastove/formidable-blabs && \
+cd formidable-blabs && \
+echo "{:slack-api-token <TOKEN>} > resources/local.edn" &&
+lein run
+```
 
 ### Bugs
 
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+Probably!
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright © 2015 Ross Donaldson
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+MIT License; see [the LICENSE](LICENSE) for details.
