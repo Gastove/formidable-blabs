@@ -16,6 +16,7 @@
 ;; !define
 ;; !whatis
 ;; !quote
+;; !impersonate
 ;;
 ;; #### Emotes:
 ;; !wat
@@ -29,11 +30,16 @@
 ;; Hello / goodbye
 
 (defn random-emote-by-key
+  "Loads a set of responses by key out of resources/emotes.edn; returns a random
+  emote"
   [k message emotes]
   (let [flips (k emotes)
         flip (rand-nth flips)
-        to-chan (:channel message)]
-    (go (>! outbound-channel [to-chan flip]))))
+        to-chan (:channel message)
+        out-msg {:type "message"
+                 :text flip
+                 :channel to-chan}]
+    (go (>! outbound-channel out-msg))))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
