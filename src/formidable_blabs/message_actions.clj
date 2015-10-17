@@ -54,7 +54,12 @@
               (log/debug "It's time! Actioning"))
           (log/info "Not performing action yet, too soon"))))))
 
-(def omg-responder (make-throttled-responder (partial random-emote-by-key :omg) 10))
+(defn get-rate-limit [k]
+  (let [emotes (load-emotes)
+        rates (:rate-limits emotes)]
+    (get rates k 10)))
+
+(def omg-responder (make-throttled-responder (partial random-emote-by-key :omg) (get-rate-limit :omg)))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
