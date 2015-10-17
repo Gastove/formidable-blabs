@@ -11,7 +11,8 @@
                  [org.clojure/core.match "0.3.0-alpha4"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [cheshire "5.5.0"]
-                 [http-kit "2.1.19"]]
+                 [http-kit "2.1.19"]
+                 [clj-time "0.11.0"]]
   :main ^:skip-aot formidable-blabs.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
