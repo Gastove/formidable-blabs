@@ -12,10 +12,13 @@ You'll need a Slack Bot Integration token for the Slack team blabs is meant to
 join.
 
 ```bash
+# First time project setup
 git clone https://github.com/Gastove/formidable-blabs && \
 cd formidable-blabs && \
-echo "{:slack-api-token <TOKEN>} > resources/local.edn" &&
-lein run
+echo "{:slack-api-token <TOKEN>} > resources/local.edn"
+
+# Start it up!
+lein trampoline run
 ```
 
 ### Bugs

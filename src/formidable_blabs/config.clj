@@ -7,8 +7,14 @@
 (nomad/defconfig blabs-config (io/resource "config.edn"))
 
 (if (= "dev" (:nomad/environment (blabs-config)))
-  (do ;; dev configs
-    (merge-config! {:appenders {:spit (appenders/spit-appender {:fname "formidable.log"
-                                                                :async? true})}}))
-  (do ;; production configs
-    ))
+  ;; dev configs
+  (do
+    (merge-config! {:appenders {:spit (appenders/spit-appender
+                                       {:fname "formidable.log"
+                                        :async? true})}}))
+  ;; production configs
+  (do
+    (merge-config! {:appenders {:spit (appenders/spit-appender
+                                       {:fname "formidable.log"
+                                        :async? true
+                                        :min-level :info})}})))
