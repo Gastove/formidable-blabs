@@ -11,7 +11,7 @@
 (def quotes-table
   [:quotes
    [:user :text]
-   [:quote :text]])
+   [:quote "TEXT NOT NULL"]])
 
 (def definitions-table
   [:definitions
@@ -58,8 +58,8 @@
   (transform ->kebab-keys))
 
 (defn record-definition
-  [definition-map]
-  (sql/insert definitions (values definition-map)))
+  [term definition]
+  (sql/insert definitions (values {:term term :definition definition})))
 
 (defn find-definiton-by-term
   [t]
@@ -68,16 +68,25 @@
 (defentity quotes)
 
 (defn record-quote
-  [quote-map]
-  (sql/insert quotes (values quote-map)))
+  [user quote-text]
+  (sql/insert quotes (values {:user user :quote quote-text})))
 
 (defn find-quote-by-user
   [u]
   (select quotes (where {:user u})))
 
-(defn find-quote-by-string
+(defn find-all-quotes
+  []
+  (select quotes))
+
+(defn find-quote-by-term
   [s]
   (select quotes (where {:quote [like (str "%" s "%")]})))
+
+(defn find-quote-by-user-or-term
+  [s]
+  (select quotes (where (or {:user s}
+                            {:quote [like (str "%" s "%")]}))))
 
 (defn find-quote-by-string-and-user
   [u s]
