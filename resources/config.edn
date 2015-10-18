@@ -5,4 +5,4 @@
                      :user-info "users.info"
                      :emoji "emoji.list"}
          :api-token "set me in your resources/local.edn"}
- :ping 10}
+ :ping 3}
