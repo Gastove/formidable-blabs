@@ -42,6 +42,24 @@
                  :channel to-chan}]
     (go (>! outbound-channel out-msg))))
 
+(declare remove-emoji-and-write! load-emoji-on-file)
+(defn random-emoji
+  [message emojis]
+  (let [emoji (rand-nth emojis)
+        to-chan (:channel message)
+        ts (:ts message)
+        resp (slack/add-emoji-response emoji to-chan ts)]
+    (if (and (= false (:ok resp))
+             (= (:error resp) "invalid_name"))
+      (do (log/info "Slack responded:" resp "for emoji named:" emoji ", removing it")
+          (remove-emoji-and-write! emoji (load-emoji-on-file))))))
+
+(defn remove-emoji-and-write!
+  [emoji emojis]
+  (let [new-emojis (vec (remove #{emoji} emojis))]
+    (spit (io/resource "emoji_names.edn") (with-out-str (pr {:names new-emojis})))
+    new-emojis))
+
 ;; ### Random Actions
 ;; Given a percent chance in 100 an action should occur, conditionally do the
 ;; action or pass
@@ -76,6 +94,15 @@
 
 (defn load-emotes []
   (edn/read-string (slurp (io/resource "emotes.edn") :encoding "utf-16")))
+
+(defn load-emoji-on-file
+  []
+  (:names (edn/read-string (slurp (io/resource "emoji_names.edn")))))
+
+(defn load-all-emoji []
+  (let [emojis-on-file (load-emoji-on-file)
+        custom-emoji (slack/get-custom-emoji)]
+    (into emojis-on-file custom-emoji)))
 
 (defn get-rate-limit [k]
   (let [emotes (load-emotes)
