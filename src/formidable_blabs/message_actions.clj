@@ -42,6 +42,17 @@
                  :channel to-chan}]
     (go (>! outbound-channel out-msg))))
 
+;; ### Random Actions
+;; Given a percent chance in 100 an action should occur, conditionally do the
+;; action or pass
+(defn make-probabalistic-responder
+  [action probability]
+  (fn [& args]
+    (let [n (rand-int 99)]
+      (if (< n probability)
+        (apply action args)
+        (log/debug "Rolled an '" n "', probability is " probability ", passing")))))
+
 ;; ### Rate Limits
 ;; Some things shouldn't run all the time. This wrapper makes a function get
 ;; called no more than every throttle-seconds seconds.
@@ -53,9 +64,15 @@
       (let [since-last-millis (* throttle-seconds 1000)]
         (if (time/after? (time/now) (time/plus @last-replied (time/millis since-last-millis)))
           (do (apply action action-args)
-              (swap! last-replied (fn [x] (time/now)))
-              (log/debug "It's time! Actioning"))
+              (swap! last-replied (fn [x] (time/now))))
           (log/info "Not performing action yet, too soon"))))))
+
+;; ### Check to see if it's time to do an action; if so, check its probability.
+(defn make-probabalistic-throttled-responder
+  ""
+  [action probability throttle-seconds]
+  (make-probabalistic-responder
+   (make-throttled-responder action probability) throttle-seconds))
 
 (defn load-emotes []
   (edn/read-string (slurp (io/resource "emotes.edn") :encoding "utf-16")))
@@ -65,8 +82,15 @@
         rates (:rate-limits emotes)]
     (get rates k 10)))
 
-(def omg-responder (make-throttled-responder (partial random-emote-by-key :omg) (get-rate-limit :omg)))
-(def oops-responder (make-throttled-responder (partial random-emote-by-key :oops) (get-rate-limit :oops)))
+(defn get-probability [k]
+  (let [emotes (load-emotes)
+        probabilities (:probabilities emotes)]
+    (get probabilities k 50)))
+
+(def omg-responder (make-throttled-responder
+                    (partial random-emote-by-key :omg) (get-rate-limit :omg)))
+(def oops-responder (make-throttled-responder
+                     (partial random-emote-by-key :oops) (get-rate-limit :oops)))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
