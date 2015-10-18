@@ -118,16 +118,18 @@
                     (partial random-emote-by-key :omg) (get-rate-limit :omg)))
 (def oops-responder (make-throttled-responder
                      (partial random-emote-by-key :oops) (get-rate-limit :oops)))
+(def random-emoji-responder (make-probabalistic-responder random-emoji 24))
 
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
 ;; string_ matches.
 (defn message-dispatch
   ""
-  [{:keys [user text] :as message :or {text "" user ""}}]
-  (log/debug message)
-  (let [emotes (load-emotes)]
-    (match [user text]
+  ;; username hack is in place for vetting emoji, revert to user when done
+  [{:keys [username text] :as message :or {text "" username ""}}]
+  (let [emotes (load-emotes)
+        emoji (load-all-emoji)]
+    (match [username text]
            [_ #"(?s)!define.+"] (log/debug "'!wat' command not yet implemented")
            [_ #"(?s)!whatis.+"] (log/debug "'!whatis' command not yet implemented")
            [_ #"(?s)!quote.+"] (log/debug "'!quote' command not yet implemented")
@@ -137,4 +139,5 @@
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
            [_ #"(?i)[omf?g ]+\s*"] (omg-responder message emotes)
            [_ #"(?i)[wh]?oops|uh-oh"] (oops-responder message emotes)
+           [_ _] (random-emoji-responder message emoji)
            :else (log/debug "No message action found."))))
