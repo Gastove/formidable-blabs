@@ -15,12 +15,11 @@
 (defmethod dispatch :default [event]
   ;; This logs a *lot* of stuff -- like keep-alives. Useful for
   ;; I'm-debugging-right-now debugging and nothing else.
-  (log/debug "No :type key in event or event type unrecognized:" event)
+  ;; (log/debug "No :type key in event or event type unrecognized:" event)
   )
 
 (defn consume-and-dispatch [in-ch]
   (go-loop [body (async/<! in-ch)]
-    (log/debug "Got from Slack:" body)
     (dispatch body)
     (if-let [next-item (async/<! in-ch)]
       (recur next-item)
@@ -38,7 +37,7 @@
             ping {:type "ping"}]
         (cond
           (= from-ch out-ch) (send! msg)
-          (= from-ch timeout-ch) (do (log/debug "Sending ping") (send! ping))))
+          (= from-ch timeout-ch) (send! ping)))
       (recur))))
 
 (defn -main

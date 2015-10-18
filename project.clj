@@ -12,7 +12,12 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [cheshire "5.5.0"]
                  [http-kit "2.1.19"]
-                 [clj-time "0.11.0"]]
+                 [clj-time "0.11.0"]
+                 [org.clojure/java.jdbc "0.4.2"]
+                 [korma "0.4.2"]
+                 [org.xerial/sqlite-jdbc "3.7.2"]
+                 [camel-snake-kebab "0.3.2"]
+                 [org.clojure/core.incubator "0.1.3"]]
   :main ^:skip-aot formidable-blabs.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

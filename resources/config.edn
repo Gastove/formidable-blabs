@@ -1,5 +1,8 @@
 {:nomad/private-file #nomad/file "resources/local.edn"
  :slack {:api-url "https://slack.com/api/"
-  :resources {:rtm-start "rtm.start"}
-  :api-token "set me in your resources/local.edn"}
+         :resources {:rtm-start "rtm.start"
+                     :reactions-add "reactions.add"
+                     :user-info "users.info"
+                     :emoji "emoji.list"}
+         :api-token "set me in your resources/local.edn"}
  :ping 3}
