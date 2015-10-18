@@ -54,6 +54,32 @@
       (do (log/info "Slack responded:" resp "for emoji named:" emoji ", removing it")
           (remove-emoji-and-write! emoji (load-emoji-on-file))))))
 
+(defn purge-emoji
+  "This thing isn't wired up, and shouldn't be, typically. It tries to solve the
+  problem, 'how on earth do you get a list of only the emoji names Slack
+  actually recognizes?' It does this by taking an immense list of emoji, then
+  commenting on a thing in slack until slack says it has to stop, waiting a
+  moment, then triggering itself to keep emojiing. #yolo"
+  [message]
+  (let [to-chan (:channel message)
+        ts (:ts message)]
+    (loop [emojis (:names (edn/read-string (slurp (io/resource "emoji_names.edn"))))]
+      (let [emoji (rand-nth emojis)
+            resp (slack/add-emoji-response emoji to-chan ts)]
+        (if (and (= false (:ok resp))
+                 (= (:error resp) "invalid_name"))
+          (do
+            (log/debug "Purging:" emoji)
+            (Thread/sleep 1000)
+            (recur (remove-emoji-and-write! emoji emojis)))
+          (if (not= (:error resp) "too_many_reactions")
+            (do
+              (Thread/sleep 1000)
+              (recur emojis))))))
+    (log/debug "Finished.")
+    (Thread/sleep 5000)
+    (slack/post-message (:channel message) "Restarting myself!")))
+
 (defn remove-emoji-and-write!
   [emoji emojis]
   (let [new-emojis (vec (remove #{emoji} emojis))]
