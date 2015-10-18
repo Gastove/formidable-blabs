@@ -13,15 +13,26 @@
             [manifold.stream :as m]
             [taoensso.timbre :as log]))
 
+(defn make-slack-request
+  ([endpoint] (make-slack-request endpoint {}))
+  ([endpoint params]
+   (let [cfg (:slack (blabs-config))
+         url (str (:api-url cfg) (get-in cfg [:resources endpoint]))
+         token (:api-token (:slack (blabs-config)))
+         updated-params (assoc params :token token)]
+     @(http/get url {:query-params updated-params}))))
+
+(defn make-slack-request-and-parse-body
+  ([endpoint] (make-slack-request-and-parse-body endpoint {}))
+  ([endpoint params]
+   (let [resp (make-slack-request endpoint params)]
+     (json/parse-string (:body resp) keyword))))
+
 (defn get-ws-url []
-  (let [cfg (:slack (blabs-config))
-        url (str (:api-url cfg) (get-in cfg [:resources :rtm-start]))
-        token (:api-token (:slack (blabs-config)))]
-    (http/get url {:query-params {:token token}})))
+  (make-slack-request-and-parse-body :rtm-start))
 
 (defn connect-to-slack []
-  (let [resp (get-ws-url)
-        body (json/parse-string (:body @resp) keyword)
+  (let [body (get-ws-url)
         ws-url (:url body)
         socket-stream @(aleph/websocket-client ws-url)
         chan (async/chan 10 (map #(json/parse-string % keyword)))]
@@ -29,6 +40,7 @@
     [socket-stream chan]))
 
 (defn send-message!
+  "Sends a standard bot RTM message over an open websocket"
   [msg conn]
   (let [body-json (json/generate-string msg)]
     (log/debug "Sending:" msg)
@@ -40,3 +52,41 @@
       (let [id (swap! id-cache inc)
             msg-with-id (assoc msg :id id)]
         (send-message! msg-with-id conn)))))
+
+(defn add-emoji-response
+  [emoji to-chan ts]
+  (let [params {:channel to-chan
+                :timestamp ts
+                :name emoji}
+        string-response (make-slack-request-and-parse-body :reaction-add params)]
+    ;; (:ok (json/parse-string (:body string-response) keyword))
+    (json/parse-string (:body string-response) keyword)))
+
+(defn post-message
+  "Posts a non-standard message over https; mostly for doing nonsense."
+  [to-chan txt]
+  (let [cfg (:slack (blabs-config))
+        url (str (:api-url cfg) "chat.postMessage")
+        token (:api-token (:slack (blabs-config)))
+        params {:token token
+                :channel to-chan
+                :text txt}]
+    (log/debug @(http/get url {:query-params params}))))
+
+(defn get-info-for-user
+  [user-id]
+  (make-slack-request-and-parse-body :user-info {:user user-id}))
+
+(defn fetch-user-name
+  [user-id]
+  (let [body (get-info-for-user user-id)]
+    (if (:ok body)
+      (get-in body [:user :name])
+      (log/error body))))
+
+(def get-user-name (memoize fetch-user-name))
+
+(defn get-custom-emoji
+  []
+  (let [resp (make-slack-request-and-parse-body :emoji)]
+    (keys (:emoji resp))))
