@@ -57,10 +57,8 @@
   [emoji to-chan ts]
   (let [params {:channel to-chan
                 :timestamp ts
-                :name emoji}
-        string-response (make-slack-request-and-parse-body :reaction-add params)]
-    ;; (:ok (json/parse-string (:body string-response) keyword))
-    (json/parse-string (:body string-response) keyword)))
+                :name emoji}]
+    (make-slack-request-and-parse-body :reactions-add params)))
 
 (defn post-message
   "Posts a non-standard message over https; mostly for doing nonsense."
@@ -89,4 +87,4 @@
 (defn get-custom-emoji
   []
   (let [resp (make-slack-request-and-parse-body :emoji)]
-    (keys (:emoji resp))))
+    (map name (keys (:emoji resp)))))
