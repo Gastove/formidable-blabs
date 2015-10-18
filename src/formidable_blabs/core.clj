@@ -10,7 +10,7 @@
 
 (defmulti dispatch #(:type %))
 (defmethod dispatch "hello" [_] (log/info "Got hello!"))
-;; (defmethod dispatch "pong" [_] (log/debug "Got pong."))
+(defmethod dispatch "pong" [_] (log/debug "Got pong."))
 (defmethod dispatch "message" [event] (message-dispatch event))
 (defmethod dispatch :default [event]
   ;; This logs a *lot* of stuff -- like keep-alives. Useful for
