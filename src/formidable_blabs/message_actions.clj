@@ -1,15 +1,18 @@
 (ns formidable-blabs.message-actions
   (:require [clj-time.core :as time]
-            [clojure.core.async :as async :refer [go >!]]
-            [clojure.core.match :as match :refer [match]]
-            [clojure.core.match.regex :refer :all]
-            [clojure.edn :as edn]
+            [clojure
+             [edn :as edn]
+             [string :as str]]
+            [clojure.core
+             [async :as async :refer [>! go]]
+             [match :as match :refer [match]]
+             [strint :refer [<<]]]
             [clojure.java.io :as io]
-            [formidable-blabs.channels :refer [outbound-channel]]
-            [formidable-blabs.db :as db]
-            [formidable-blabs.slack :as slack]
-            [taoensso.timbre :as log]
-            [clojure.core.strint :refer [<<]]))
+            [formidable-blabs
+             [channels :refer [outbound-channel]]
+             [db :as db]
+             [slack :as slack]]
+            [taoensso.timbre :as log]))
 
 ;; ### Message Actions
 ;; Actions based on either the sender of a message, the channel of a message,
