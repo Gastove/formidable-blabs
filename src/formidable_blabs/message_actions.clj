@@ -7,6 +7,7 @@
              [async :as async :refer [>! go]]
              [match :as match :refer [match]]
              [strint :refer [<<]]]
+            [clojure.core.match.regex :refer :all]
             [clojure.java.io :as io]
             [formidable-blabs
              [channels :refer [outbound-channel]]
