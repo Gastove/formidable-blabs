@@ -65,7 +65,7 @@
         resp (slack/add-emoji-response emoji to-chan ts)]
     (if (and (= false (:ok resp))
              (= (:error resp) "invalid_name"))
-      (do (log/info "Slack responded:" resp "for emoji named:" emoji ", removing it")
+      (do (log/info (<< "Slack responded '~{resp}' for emoji named '~{emoji}, removing it"))
           (remove-emoji-and-write! emoji (load-emoji-on-file))))))
 
 (defn purge-emoji
