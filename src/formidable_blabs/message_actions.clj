@@ -263,7 +263,7 @@
            [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
            [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
-           [_ #"(?i)[omf?g ]+\s*"] (omg-responder message emotes)
+           [_ #"(?i)[z?omf?g ]+\s*"] (omg-responder message emotes)
            [_ #"(?i)[wh]*oops|uh-oh"] (oops-responder message emotes)
            [_ #"(?s)!q[uote]* add \w+ .+"] (add-quote! message)
            [_ #"!q[uote]* \w+\s?\d*"] (find-quote message)
