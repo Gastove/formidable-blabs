@@ -155,10 +155,14 @@
     (get probabilities k 50)))
 
 (def omg-responder (make-throttled-responder
-                    (partial random-emote-by-key :omg) (get-rate-limit :omg)))
+                    (partial random-emote-by-key :omg)
+                    (get-rate-limit :omg)))
 (def oops-responder (make-throttled-responder
-                     (partial random-emote-by-key :oops) (get-rate-limit :oops)))
-(def random-emoji-responder (make-probabalistic-responder random-emoji 24))
+                     (partial random-emote-by-key :oops)
+                     (get-rate-limit :oops)))
+(def random-emoji-responder (make-probabalistic-responder
+                             random-emoji
+                             (get-probability :random-emoji)))
 
 ;; ### Quotes
 ;; Add a quote, search a quote by term, search a quote and return a specific result
@@ -241,12 +245,17 @@
     (re-pattern (str/join \| names))))
 
 ;; ### Dispatcher
+;; Matches on the combination of [username text], typically using simple string
+;; matching for username and a regexp for text.
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
 ;; string_ matches.
 (defn message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
   (let [emotes (load-emotes)
+        opt-ins (:opt-ins emotes)
+        oops-users (name-regex (:oops opt-ins))
+        random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
@@ -261,5 +270,5 @@
            [_ #"(?s)!define \w+: .+"] (add-definition! message)
            [_ #"(?s)!define.+"] (send-define-help message)
            [_ #"(?s)!whatis .+"] (find-definition message)
-           [_ _] (random-emoji-responder message emoji)
+           [random-emoji-users _] (random-emoji-responder message emoji)
            :else (log/debug "No message action found."))))
