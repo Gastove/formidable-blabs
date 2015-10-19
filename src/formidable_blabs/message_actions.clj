@@ -17,21 +17,28 @@
 ;; reactions.
 ;;
 ;; #### Commands:
-;; !define
-;; !whatis
-;; !quote
-;; !impersonate
+;; Explicit orders given to the bot; usually involving calls to either the
+;; database or the Slack API.
+;; !define -- Term definitions
+;; !whatis -- Term lookup
+;; !quote - Quote storage and search
+;; !impersonate (not yet implemented) -- Remix somebody's words
 ;;
 ;; #### Emotes:
+;; Intentionally triggered actions that always return a random reaction.
 ;; !wat
 ;; !welp
 ;; !nope
 ;; !tableflip
+;; !darkglasses (not implemented)
 ;;
 ;; ### Reactions:
-;; business
-;; !darkglasses
-;; Hello / goodbye
+;; Things the bot does on its own based on text triggers. Usually either
+;; rate-limited, probabalistic, or both.
+;; business (not implemented)
+;; Hello / goodbye (not implemented)
+;; [wh]oops
+;; Random emotes
 
 (defn send-msg-on-channel!
   [slack-channel text]
