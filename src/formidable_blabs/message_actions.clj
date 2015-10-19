@@ -234,6 +234,11 @@
         msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
     (send-msg-on-channel! channel msg)))
 
+(defn name-regex [names]
+  (if (or (= names :all) (nil? names))
+    #"(?s).+"
+    (re-pattern (str/join \| names))))
+
 ;; ### Dispatcher
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
 ;; string_ matches.
