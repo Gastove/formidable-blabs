@@ -160,6 +160,9 @@
 (def oops-responder (make-throttled-responder
                      (partial random-emote-by-key :oops)
                      (get-rate-limit :oops)))
+(def bam-responder (make-throttled-responder
+                     (partial random-emote-by-key :bam)
+                     0))
 (def random-emoji-responder (make-probabalistic-responder
                              random-emoji
                              (get-probability :random-emoji)))
@@ -266,6 +269,7 @@
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
            [_ #"(?i)[z?omf?g ]+\s*"] (omg-responder message emotes)
            [_ #"(?i)[wh]*oops|uh-oh"] (oops-responder message emotes)
+           [_ #"(?i)!?bam!?"] (bam-responder message emotes)
            [_ #"(?s)!q[uote]* add \w+ .+"] (add-quote! message)
            [_ #"!q[uote]* \w+\s?\d*"] (find-quote message)
            [_ #"(?s)!define \w+: .+"] (add-definition! message)
