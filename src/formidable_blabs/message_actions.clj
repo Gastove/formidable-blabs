@@ -1,15 +1,19 @@
 (ns formidable-blabs.message-actions
   (:require [clj-time.core :as time]
-            [clojure.core.async :as async :refer [go >!]]
-            [clojure.core.match :as match :refer [match]]
+            [clojure
+             [edn :as edn]
+             [string :as str]]
+            [clojure.core
+             [async :as async :refer [>! go]]
+             [match :as match :refer [match]]
+             [strint :refer [<<]]]
             [clojure.core.match.regex :refer :all]
-            [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [formidable-blabs.channels :refer [outbound-channel]]
-            [formidable-blabs.db :as db]
-            [formidable-blabs.slack :as slack]
-            [taoensso.timbre :as log]
-            [clojure.core.strint :refer [<<]]))
+            [formidable-blabs
+             [channels :refer [outbound-channel]]
+             [db :as db]
+             [slack :as slack]]
+            [taoensso.timbre :as log]))
 
 ;; ### Message Actions
 ;; Actions based on either the sender of a message, the channel of a message,
@@ -17,21 +21,28 @@
 ;; reactions.
 ;;
 ;; #### Commands:
-;; !define
-;; !whatis
-;; !quote
-;; !impersonate
+;; Explicit orders given to the bot; usually involving calls to either the
+;; database or the Slack API.
+;; !define -- Term definitions
+;; !whatis -- Term lookup
+;; !quote - Quote storage and search
+;; !impersonate (not yet implemented) -- Remix somebody's words
 ;;
 ;; #### Emotes:
+;; Intentionally triggered actions that always return a random reaction.
 ;; !wat
 ;; !welp
 ;; !nope
 ;; !tableflip
+;; !darkglasses (not implemented)
 ;;
 ;; ### Reactions:
-;; business
-;; !darkglasses
-;; Hello / goodbye
+;; Things the bot does on its own based on text triggers. Usually either
+;; rate-limited, probabalistic, or both.
+;; business (not implemented)
+;; Hello / goodbye (not implemented)
+;; [wh]oops
+;; Random emotes
 
 (defn send-msg-on-channel!
   [slack-channel text]
@@ -55,7 +66,7 @@
         resp (slack/add-emoji-response emoji to-chan ts)]
     (if (and (= false (:ok resp))
              (= (:error resp) "invalid_name"))
-      (do (log/info "Slack responded:" resp "for emoji named:" emoji ", removing it")
+      (do (log/info (<< "Slack responded '~{resp}' for emoji named '~{emoji}, removing it"))
           (remove-emoji-and-write! emoji (load-emoji-on-file))))))
 
 (defn purge-emoji
@@ -144,10 +155,17 @@
     (get probabilities k 50)))
 
 (def omg-responder (make-throttled-responder
-                    (partial random-emote-by-key :omg) (get-rate-limit :omg)))
+                    (partial random-emote-by-key :omg)
+                    (get-rate-limit :omg)))
 (def oops-responder (make-throttled-responder
-                     (partial random-emote-by-key :oops) (get-rate-limit :oops)))
-(def random-emoji-responder (make-probabalistic-responder random-emoji 24))
+                     (partial random-emote-by-key :oops)
+                     (get-rate-limit :oops)))
+(def bam-responder (make-throttled-responder
+                     (partial random-emote-by-key :bam)
+                     0))
+(def random-emoji-responder (make-probabalistic-responder
+                             random-emoji
+                             (get-probability :random-emoji)))
 
 ;; ### Quotes
 ;; Add a quote, search a quote by term, search a quote and return a specific result
@@ -224,26 +242,38 @@
         msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
     (send-msg-on-channel! channel msg)))
 
+(defn name-regex [names]
+  (if (or (= names :all) (nil? names))
+    #"(?s).+"
+    (re-pattern (str/join \| names))))
+
 ;; ### Dispatcher
+;; Matches on the combination of [username text], typically using simple string
+;; matching for username and a regexp for text.
 ;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
 ;; string_ matches.
 (defn message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
   (let [emotes (load-emotes)
+        opt-ins (:opt-ins emotes)
+        oops-users (name-regex (:oops opt-ins))
+        random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
            [_ #"!wat\s*"] (random-emote-by-key :wat message emotes)
+           [_ #"!unicorns\s*"] (random-emote-by-key :unicorns message emotes)
            [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
            [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
-           [_ #"(?i)[omf?g ]+\s*"] (omg-responder message emotes)
+           [_ #"(?i)[z?omf?g ]+\s*"] (omg-responder message emotes)
            [_ #"(?i)[wh]*oops|uh-oh"] (oops-responder message emotes)
+           [_ #"(?i)!?bam!?"] (bam-responder message emotes)
            [_ #"(?s)!q[uote]* add \w+ .+"] (add-quote! message)
            [_ #"!q[uote]* \w+\s?\d*"] (find-quote message)
            [_ #"(?s)!define \w+: .+"] (add-definition! message)
            [_ #"(?s)!define.+"] (send-define-help message)
            [_ #"(?s)!whatis .+"] (find-definition message)
-           [_ _] (random-emoji-responder message emoji)
+           [random-emoji-users _] (random-emoji-responder message emoji)
            :else (log/debug "No message action found."))))
