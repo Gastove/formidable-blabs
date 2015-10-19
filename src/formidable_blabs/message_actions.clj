@@ -260,6 +260,7 @@
         username (slack/get-user-name user)]
     (match [username text]
            [_ #"!wat\s*"] (random-emote-by-key :wat message emotes)
+           [_ #"!unicorns\s*"] (random-emote-by-key :unicorns message emotes)
            [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
            [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
