@@ -18,7 +18,8 @@ cd formidable-blabs && \
 echo "{:slack-api-token <TOKEN>} > resources/local.edn"
 
 # Start it up!
-lein trampoline run
+# Set env to dev if you want hella verbose logging ;-P
+NOMAD_ENV=prod lein trampoline run
 ```
 
 ### Bugs
