@@ -2,9 +2,9 @@
 
 I'm a slack bot! At the moment, I'm not a super good one. Stay tuned.
 
-## Installation
+## Dependencies
 
-The only thing you need is a recent installation of [Leiningen](http://leiningen.org/).
+You need: a recent installation of [Leiningen](http://leiningen.org/); sqlite3.
 
 ## Usage
 
