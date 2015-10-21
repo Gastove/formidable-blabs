@@ -60,6 +60,7 @@
 (declare remove-emoji-and-write! load-emoji-on-file)
 (defn random-emoji
   [message emojis]
+  (log/debug "Responding with a random emoji")
   (let [emoji (rand-nth emojis)
         to-chan (:channel message)
         ts (:ts message)
@@ -269,7 +270,8 @@
   (let [emotes (load-emotes)
         opt-ins (:opt-ins emotes)
         oops-users (name-regex (:oops opt-ins))
-        random-emoji-users (name-regex (:random-emoji opt-ins))
+        ;; Crud, match is compile-time literals only. This wont work like this.
+        ;; random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
@@ -287,5 +289,5 @@
            [_ #"(?s)!define \w+: .+"] (add-definition! message)
            [_ #"(?s)!define.+"] (send-define-help message)
            [_ #"(?s)!whatis .+"] (find-definition message)
-           [random-emoji-users _] (random-emoji-responder message emoji)
+           [_ _] (random-emoji-responder message emoji)
            :else (log/debug "No message action found."))))
