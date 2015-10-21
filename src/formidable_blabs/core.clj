@@ -6,7 +6,16 @@
              [config :refer [blabs-config]]
              [message-actions :refer [message-dispatch]]
              [slack :refer [connect-to-slack make-message-sender]]]
+            [manifold.stream :as m]
             [taoensso.timbre :as log]))
+
+;; h/t David Nolen
+(defn throw-err [e]
+  (when (instance? Throwable e) (throw e))
+  e)
+
+(defmacro <? [ch]
+  `(throw-err (async/<! ~ch)))
 
 (defmulti dispatch #(:type %))
 (defmethod dispatch "hello" [_] (log/info "Got hello!"))
@@ -18,31 +27,33 @@
   ;; (log/debug "No :type key in event or event type unrecognized:" event)
   )
 
-(defn consume-and-dispatch [in-ch]
-  (go-loop [body (async/<! in-ch)]
-    (dispatch body)
-    (if-let [next-item (async/<! in-ch)]
-      (recur next-item)
-      (log/debug "Got nil on in-ch, exiting."))))
+(defn consume-and-dispatch [socket]
+  (go-loop []
+    (try (if-let [raw-body @(m/take! socket)]
+           (let [body (json/parse-string raw-body keyword)]
+             (dispatch body)
+             (recur))
+           (log/debug "take! from websocket failed, exiting."))
+         (catch Exception e e))))
 
 (defn process-outbound
   "Sends outgoing messages. Sends a ping every <config> seconds in which there
   hasn't been any other traffic."
   [out-ch sock]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
-        send! (make-message-sender sock)]
-    (loop []
+        send! (make-message-sender socket)
+        send-ping! #(send! {:type "ping"})]
+    (go-loop []
       (let [timeout-ch (async/timeout ping-millis)
-            [msg from-ch] (async/alts!! [out-ch timeout-ch])
-            ping {:type "ping"}]
+            [msg from-ch] (async/alts! [out-ch timeout-ch])]
         (cond
           (= from-ch out-ch) (send! msg)
-          (= from-ch timeout-ch) (send! ping)))
+          (= from-ch timeout-ch) (send-ping!)))
       (recur))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (let [[sock ch] (connect-to-slack)]
+  (let [socket (connect-to-slack)]
     (consume-and-dispatch ch)
     (process-outbound outbound-channel sock)))
