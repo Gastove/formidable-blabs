@@ -162,8 +162,8 @@
                      (partial random-emote-by-key :oops)
                      (get-rate-limit :oops)))
 (def bam-responder (make-throttled-responder
-                     (partial random-emote-by-key :bam)
-                     0))
+                    (partial random-emote-by-key :bam)
+                    0))
 (def random-emoji-responder (make-probabalistic-responder
                              random-emoji
                              (get-probability :random-emoji)))
@@ -182,10 +182,13 @@
 
 (defn bounded-rand-int
   [lower upper]
-  (loop [n (rand-int upper)]
-    (if (< n lower)
-      (recur (rand-int upper))
-      n)))
+  (cond
+    (= lower upper) lower
+    (< (- upper lower) 100) (rand-nth (range lower upper))
+    :else (loop [n (rand-int upper)]
+            (if (< n lower)
+              (recur (rand-int upper))
+              n))))
 
 (defn extract-quote-num
   [text num-quotes]
@@ -195,17 +198,16 @@
 (defn find-quote-for-user-or-term
   [{:keys [text channel]}]
   (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
-    (do (log/debug (re-find #"!q[uote]* \w+ (\d+)" text))
-        (let [result-seq (db/find-quote-by-user-or-term user-or-term)]
-          (if-not (empty? result-seq)
-           (let [num-quotes (count result-seq)
-                 n (extract-quote-num text num-quotes)
-                 ;; Vectors are zero-indexed, so nth accordingly.
-                 q (nth result-seq (- n 1) (last result-seq))
-                 {user :user quote-text :quote} q
-                 msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
-             (send-msg-on-channel! channel msg))
-           (log/debug (<< "No quote found for ~{user-or-term}")))))))
+    (let [result-seq (db/find-quote-by-user-or-term user-or-term)]
+      (if-not (empty? result-seq)
+        (let [num-quotes (count result-seq)
+              n (extract-quote-num text num-quotes)
+              ;; Vectors are zero-indexed, so nth accordingly.
+              q (nth result-seq (- n 1) (last result-seq))
+              {user :user quote-text :quote} q
+              msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
+          (send-msg-on-channel! channel msg))
+        (log/debug (<< "No quote found for ~{user-or-term}"))))))
 
 (defn find-random-quote
   [{:keys [channel]}]
@@ -213,7 +215,7 @@
     (if-not (empty? all-quotes)
       (let [{:keys [user quote]} (rand-nth all-quotes)
             msg (<< "~{user}: ~{quote}")]
-       (send-msg-on-channel! channel msg))
+        (send-msg-on-channel! channel msg))
       (send-msg-on-channel! channel "Quote DB is empty! Quote some things and try again"))))
 
 ;; ### Definitions
