@@ -192,8 +192,13 @@
 
 (defn extract-quote-num
   [text num-quotes]
-  (Integer/parseInt (or (second (re-find #"!q[uote]* \w+ (\d+)" text))
-                        (str (bounded-rand-int 1 num-quotes)))))
+  (if-let [found (re-find #"!q[uote]* \w+ (\d+)" text)]
+    (let [parsed-int (Integer/parseInt (second found))]
+      (cond
+        (< parsed-int 1) 1
+        (> parsed-int num-quotes) num-quotes
+        :else parsed-int))
+    (bounded-rand-int 1 num-quotes)))
 
 (defn find-quote-for-user-or-term
   [{:keys [text channel]}]
