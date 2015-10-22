@@ -17,6 +17,9 @@
 (defmacro <? [ch]
   `(throw-err (async/<! ~ch)))
 
+(defmacro ?> [ch item]
+  `(throw-err (async/>! ~ch ~item)))
+
 (defmulti dispatch #(:type %))
 (defmethod dispatch "hello" [_] (log/info "Got hello!"))
 (defmethod dispatch "pong" [_] (log/debug "Got pong."))
