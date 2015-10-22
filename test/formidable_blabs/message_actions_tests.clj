@@ -15,18 +15,19 @@
      (is (empty? res)
          "Lower bound should be respected"))))
 
-(deftest quoting
-  (testing "Can we return an int from a string that might not have one?"
-    (let [has-int "!q gastove 1"
-          has-no-int "!q gastove"]
-      (is (= (ma/extract-quote-num has-int 1) 1))
-      (is (= (ma/extract-quote-num has-no-int 1) 1))))
-  (testing "Do we correctly handle ridiculous numbers?"
-    (let [bad "!q gastove 0"
-          terribad "!q gastove -500"
-          wat "!q gastove 0000000000"
-          huge "!q gastove 5000000"]
-      (is (= (ma/extract-quote-num bad 1) 1))
-      (is (= (ma/extract-quote-num terribad 1) 1))
-      (is (= (ma/extract-quote-num wat 1) 1))
-      (is (= (ma/extract-quote-num huge 10) 10)))))
+(deftest number-extraction
+  (let [r #"(\d+)"]
+    (testing "Can we return an int from a string that might not have one?"
+      (let [has-int "5"
+            has-no-int "cat"]
+        (is (= (ma/extract-num-with-regex has-int 1 r) 1))
+        (is (= (ma/extract-num-with-regex has-no-int 1 r) 1))))
+    (testing "Do we correctly handle ridiculous numbers?"
+      (let [bad "0"
+            terribad "-500"
+            wat "0000000000"
+            huge "5000000"]
+        (is (= (ma/extract-num-with-regex bad 1 r) 1))
+        (is (= (ma/extract-num-with-regex terribad 1 r) 1))
+        (is (= (ma/extract-num-with-regex wat 1 r) 1))
+        (is (= (ma/extract-num-with-regex huge 10 r) 10))))))

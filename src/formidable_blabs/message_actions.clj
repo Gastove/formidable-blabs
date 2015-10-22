@@ -190,15 +190,23 @@
               (recur (rand-int upper))
               n))))
 
-(defn extract-quote-num
-  [text num-quotes]
-  (if-let [found (re-find #"!q[uote]* \w+ (\d+)" text)]
+(defn extract-num-with-regex
+  [text num-quotes r]
+  (if-let [found (re-find r text)]
     (let [parsed-int (Integer/parseInt (second found))]
       (cond
         (< parsed-int 1) 1
         (> parsed-int num-quotes) num-quotes
         :else parsed-int))
     (bounded-rand-int 1 num-quotes)))
+
+(defn extract-quote-num
+  [text num-quotes]
+  (extract-num-with-regex text num-quotes #"!q[uote]* \w+ (\d+)"))
+
+(defn extract-definition-number
+  [text num-defs]
+  (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)"))
 
 (defn find-quote-for-user-or-term
   [{:keys [text channel]}]
@@ -239,11 +247,6 @@
   (send-msg-on-channel!
    channel
    "I didn't get that. To define a term, use the command format, `!define term: definition`"))
-
-(defn extract-definition-number
-  [text num-defs]
-  (Integer/parseInt (or (second (re-find #"(?s)!whatis .+ (\d+)" text))
-                        (str num-defs))))
 
 (defn third
   [coll]
