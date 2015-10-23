@@ -1,16 +1,10 @@
 (ns formidable-blabs.slack
-  (:require [formidable-blabs.config :refer [blabs-config]]
+  (:require [aleph.http :as aleph]
+            [cheshire.core :as json]
+            [clojure.core.async :as async]
+            [formidable-blabs.config :refer [blabs-config]]
+            [manifold.stream :as m]
             [org.httpkit.client :as http]
-            [aleph.http :as aleph]
-            [cheshire.core :as json]
-            [clojure.core.async :as async]
-            [manifold.stream :as m]
-            [cheshire.core :as json]
-            [clojure.core.async :as async]
-            [manifold.stream :as m]
-            [taoensso.timbre :as log]
-            [clojure.core.async :as async]
-            [manifold.stream :as m]
             [taoensso.timbre :as log]))
 
 (defn make-slack-request
