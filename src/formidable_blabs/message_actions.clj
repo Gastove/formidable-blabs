@@ -213,10 +213,13 @@
   (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)" identity))
 
 (defn find-quote-for-user-or-term
-  ([m] (find-quote-for-user-or-term m send-msg-on-channel!))
-  ([{:keys [text channel]} send-fn]
+  ([m]
+   (find-quote-for-user-or-term m
+                                send-msg-on-channel!
+                                db/find-quote-by-user-or-term))
+  ([{:keys [text channel]} send-fn lookup-fn]
    (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
-     (let [result-seq (db/find-quote-by-user-or-term user-or-term)]
+     (let [result-seq (lookup-fn user-or-term)]
        (if-not (empty? result-seq)
          (let [num-quotes (count result-seq)
                n (extract-quote-num text num-quotes)
@@ -258,6 +261,12 @@
   [coll]
   (nth coll 2))
 
+;; ### Definition Lookup
+;; You may be thinking, `find-defintion` looks an _awful lot_ like
+;; `find-quote-for-user-or-term` -- and you're right. The important difference
+;; is: you can define nearly anything, so the regex must match on `.+` to be
+;; sure of getting everything -- which means, `term` needs to be parsed out with
+;; `second`. Haven't figured out _quite_ how to abstract this all together yet.
 (defn find-definition
   ([m] (find-definition m send-msg-on-channel! db/find-definiton-by-term))
   ([{:keys [text channel]} send-fn lookup-fn]
