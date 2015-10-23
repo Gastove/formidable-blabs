@@ -191,78 +191,85 @@
               n))))
 
 (defn extract-num-with-regex
-  [text num-quotes r]
-  (if-let [found (re-find r text)]
-    (let [parsed-int (Integer/parseInt (second found))]
-      (cond
-        (< parsed-int 1) 1
-        (> parsed-int num-quotes) num-quotes
-        :else parsed-int))
-    (bounded-rand-int 1 num-quotes)))
+  ([text num-quotes r] (extract-num-with-regex text num-quotes r identity))
+  ([text num-quotes r not-found-fn]
+   (if-let [found (re-find r text)]
+     (let [parsed-int (Integer/parseInt (second found))]
+       (cond
+         (< parsed-int 1) 1
+         (> parsed-int num-quotes) num-quotes
+         :else parsed-int))
+     (not-found-fn num-quotes))))
 
 (defn extract-quote-num
   [text num-quotes]
-  (extract-num-with-regex text num-quotes #"!q[uote]* \w+ (\d+)"))
+  (extract-num-with-regex text
+                          num-quotes
+                          #"!q[uote]* \w+ (\d+)"
+                          (partial bounded-rand-int 1)))
 
 (defn extract-definition-number
   [text num-defs]
-  (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)"))
+  (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)" identity))
 
 (defn find-quote-for-user-or-term
-  [{:keys [text channel]}]
-  (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
-    (let [result-seq (db/find-quote-by-user-or-term user-or-term)]
-      (if-not (empty? result-seq)
-        (let [num-quotes (count result-seq)
-              n (extract-quote-num text num-quotes)
-              ;; Vectors are zero-indexed, so nth accordingly.
-              q (nth result-seq (- n 1) (last result-seq))
-              {user :user quote-text :quote} q
-              msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
-          (send-msg-on-channel! channel msg))
-        (log/debug (<< "No quote found for ~{user-or-term}"))))))
+  ([m] (find-quote-for-user-or-term m send-msg-on-channel!))
+  ([{:keys [text channel]} send-fn]
+   (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
+     (let [result-seq (db/find-quote-by-user-or-term user-or-term)]
+       (if-not (empty? result-seq)
+         (let [num-quotes (count result-seq)
+               n (extract-quote-num text num-quotes)
+               ;; Vectors are zero-indexed, so nth accordingly.
+               {user :user quote-text :quote} (nth result-seq (- n 1))
+               msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
+           (send-fn channel msg))
+         (log/debug (<< "No quote found for ~{user-or-term}")))))))
 
 (defn find-random-quote
-  [{:keys [channel]}]
-  (let [all-quotes (db/find-all-quotes)]
-    (if-not (empty? all-quotes)
-      (let [{:keys [user quote]} (rand-nth all-quotes)
-            msg (<< "~{user}: ~{quote}")]
-        (send-msg-on-channel! channel msg))
-      (send-msg-on-channel! channel "Quote DB is empty! Quote some things and try again"))))
+  ([m] (find-random-quote m send-msg-on-channel!))
+  ([{:keys [channel]} send-fn]
+   (let [all-quotes (db/find-all-quotes)]
+     (if-not (empty? all-quotes)
+       (let [{:keys [user quote]} (rand-nth all-quotes)
+             msg (<< "~{user}: ~{quote}")]
+         (send-fn channel msg))
+       (send-fn channel "Quote DB is empty! Quote some things and try again")))))
 
 ;; ### Definitions
 (defn add-definition!
-  [{:keys [text channel]}]
-  (if-let [[_ term definition] (re-find #"(?s)!define (\w+): (.+)" text)]
-    (do
-      (db/record-definition term definition)
-      (send-msg-on-channel! channel (<< "Okay! `~{term}` is now defined as, `~{definition}`")))
-    (do
-      (send-msg-on-channel! "Erk! Something went wrong. I couldn't define that.")
-      (log/error "Couldn't get a definition out of:" text))))
+  ([m] (add-definition! m send-msg-on-channel!))
+  ([{:keys [text channel]} send-fn]
+   (if-let [[_ term definition] (re-find #"(?s)!define (\w+): (.+)" text)]
+     (do
+       (db/record-definition term definition)
+       (send-fn channel (<< "Okay! `~{term}` is now defined as, `~{definition}`")))
+     (do
+       (send-fn "Erk! Something went wrong. I couldn't define that.")
+       (log/error "Couldn't get a definition out of:" text)))))
 
 (defn send-define-help
   [{:keys [text channel]}]
-  (send-msg-on-channel!
-   channel
-   "I didn't get that. To define a term, use the command format, `!define term: definition`"))
+  (let [msg (str "I didn't get that. To define a term, use the command"
+                 " format, `!define term: definition`")]
+    (send-msg-on-channel! channel msg)))
 
 (defn third
   [coll]
   (nth coll 2))
 
 (defn find-definition
-  [{:keys [text channel]}]
-  (let [m (re-find #"(?s)!whatis (.+)\s\d+|!whatis (.+)" text)
-        term (or (second m) (third m))
-        result-seq (db/find-definiton-by-term term)
-        num-defs (count result-seq)
-        n (extract-definition-number text num-defs)
-        d (nth result-seq (- n 1) (last result-seq))
-        {defd-on :defined-at definition :definition} d
-        msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
-    (send-msg-on-channel! channel msg)))
+  ([m] (find-definition m send-msg-on-channel! db/find-definiton-by-term))
+  ([{:keys [text channel]} send-fn lookup-fn]
+   (let [m (re-find #"(?s)!whatis (.+)\s\d+|!whatis (.+)" text)
+         term (or (second m) (third m))
+         result-seq (lookup-fn term)
+         num-defs (count result-seq)
+         n (extract-definition-number text num-defs)
+         d (nth result-seq (- n 1))
+         {defd-on :defined-at definition :definition} d
+         msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
+     (send-fn channel msg))))
 
 (defn name-regex [names]
   (if (or (= names :all) (nil? names))

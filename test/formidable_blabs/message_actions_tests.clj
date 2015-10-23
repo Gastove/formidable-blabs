@@ -2,7 +2,7 @@
   (:require [formidable-blabs.message-actions :as ma]
             [clojure.test :as t :refer [deftest testing is]]))
 
-(deftest test-utilities
+(deftest utilities-test
   (testing "Can we return correct, fast results for bounded-rand-int?"
     (is (= (ma/bounded-rand-int 1 1) 1)
         "Bounded between 1 and 1 should be 1")
@@ -12,10 +12,10 @@
           "Upper bound should be respected"))
     (let [nums (repeatedly 1000 #(ma/bounded-rand-int 50 100))
           res (filter #(< % 50) nums)]
-     (is (empty? res)
-         "Lower bound should be respected"))))
+      (is (empty? res)
+          "Lower bound should be respected"))))
 
-(deftest number-extraction
+(deftest number-extraction-test
   (let [r #"(\d+)"]
     (testing "Can we return an int from a string that might not have one?"
       (let [has-int "5"
@@ -31,3 +31,27 @@
         (is (= (ma/extract-num-with-regex terribad 1 r) 1))
         (is (= (ma/extract-num-with-regex wat 1 r) 1))
         (is (= (ma/extract-num-with-regex huge 10 r) 10))))))
+
+(defn lookup-fn-util
+  [expected]
+  (let [result [{:defined-at "now" :definition "hi"}
+                {:defined-at "then" :definition "bye"}]]
+    (fn [got]
+      (is (= expected got))
+      result)))
+
+(defn send-fn [& args] args)
+
+(deftest find-definition-test
+  (testing "Can we find without an index?"
+    (let [incoming {:text "!whatis cat" :channel "poot"}
+          expected '("poot" "cat:\n> bye\n Definition 2 of 2; last defined then")
+          lookup-fn (lookup-fn-util "cat")
+          res (ma/find-definition incoming send-fn lookup-fn)]
+      (is (= res expected))))
+  (testing "Can we find with an index?"
+    (let [incoming {:text "!whatis cat 1" :channel "poot"}
+          expected '("poot" "cat:\n> hi\n Definition 1 of 2; last defined now")
+          lookup-fn (lookup-fn-util "cat")
+          res (ma/find-definition incoming send-fn lookup-fn)]
+      (is (= res expected)))))
