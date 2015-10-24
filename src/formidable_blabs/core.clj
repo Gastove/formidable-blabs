@@ -1,4 +1,7 @@
 (ns formidable-blabs.core
+  "This is the main orchestration namespace. It provides a main method and a
+  `dispatch` multimethod for taking action on events from Slack.
+  "
   (:gen-class)
   (:require [clojure.core.async :as async :refer [go-loop]]
             [formidable-blabs
@@ -8,6 +11,11 @@
              [slack :refer [connect-to-slack make-message-sender]]]
             [taoensso.timbre :as log]))
 
+
+;; ### Event Dispatch
+;; Dispatches on the `:type` key of a parsed JSON body from Slack's RTM API.
+;; See See https://api.slack.com/rtm for a full list of possible events, and
+;; more about the RTM API itself.
 (defmulti dispatch #(:type %))
 (defmethod dispatch "hello" [_] (log/info "Got hello!"))
 (defmethod dispatch "pong" [_] (log/debug "Got pong."))
@@ -18,7 +26,9 @@
   ;; (log/debug "No :type key in event or event type unrecognized:" event)
   )
 
-(defn consume-and-dispatch [in-ch]
+(defn consume-and-dispatch
+  "Asynchronously consume events off in-ch and dispatch them."
+  [in-ch]
   (go-loop [body (async/<! in-ch)]
     (dispatch body)
     (if-let [next-item (async/<! in-ch)]
@@ -26,7 +36,7 @@
       (log/debug "Got nil on in-ch, exiting."))))
 
 (defn process-outbound
-  "Sends outgoing messages. Sends a ping every <config> seconds in which there
+  "Sends outgoing messages. Sends a ping every `config` seconds in which there
   hasn't been any other traffic."
   [out-ch sock]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
@@ -41,7 +51,8 @@
       (recur))))
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Runs the whole works. Starts a background process to consume/dispatch events,
+  and a foreground proc to send them to Slack."
   [& args]
   (let [[sock ch] (connect-to-slack)]
     (consume-and-dispatch ch)
