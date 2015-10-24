@@ -1,6 +1,7 @@
 (ns formidable-blabs.core
   (:gen-class)
-  (:require [clojure.core.async :as async :refer [go-loop]]
+  (:require [cheshire.core :as json]
+            [clojure.core.async :as async :refer [go-loop]]
             [formidable-blabs
              [channels :refer [outbound-channel]]
              [config :refer [blabs-config]]
@@ -31,24 +32,25 @@
   )
 
 (defn consume-and-dispatch [socket]
-  (go-loop []
-    (try (if-let [raw-body @(m/take! socket)]
-           (let [body (json/parse-string raw-body keyword)]
-             (dispatch body)
-             (recur))
-           (log/debug "take! from websocket failed, exiting."))
-         (catch Exception e e))))
+  (try
+    (go-loop []
+      (if-let [raw-body @(m/take! socket)]
+        (let [body (json/parse-string raw-body keyword)]
+          (dispatch body)
+          (recur))
+        (log/debug "take! from websocket failed, exiting.")))
+    (catch Exception e e)))
 
 (defn process-outbound
   "Sends outgoing messages. Sends a ping every <config> seconds in which there
   hasn't been any other traffic."
-  [out-ch sock]
+  [out-ch socket]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
         send! (make-message-sender socket)
         send-ping! #(send! {:type "ping"})]
-    (go-loop []
+    (loop []
       (let [timeout-ch (async/timeout ping-millis)
-            [msg from-ch] (async/alts! [out-ch timeout-ch])]
+            [msg from-ch] (async/alts!! [out-ch timeout-ch])]
         (cond
           (= from-ch out-ch) (send! msg)
           (= from-ch timeout-ch) (send-ping!)))
@@ -57,6 +59,10 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (let [socket (connect-to-slack)]
-    (consume-and-dispatch ch)
-    (process-outbound outbound-channel sock)))
+  (loop []
+    (try
+      (let [socket (connect-to-slack)]
+        (consume-and-dispatch socket)
+        (process-outbound outbound-channel socket))
+      (catch Exception e (log/error e)))
+    (recur)))
