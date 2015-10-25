@@ -1,5 +1,7 @@
 # formidable-blabs
 
+[![Build Status](https://travis-ci.org/Gastove/formidable-blabs.svg?branch=master)](https://travis-ci.org/Gastove/formidable-blabs)
+
 Hi! I'm Blabs, a Slack bot originally written for the fine people at Formidable
 Labs. You could run me, too! I have minimal external dependencies, and a lot of
 my behavior can be configured from a flat file. I'm also pretty easy to extend,
