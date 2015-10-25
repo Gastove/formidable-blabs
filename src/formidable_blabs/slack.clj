@@ -39,20 +39,6 @@
     ;; (m/connect socket-stream chan)
     socket-stream))
 
-(defn send-message!
-  "Sends a standard bot RTM message over an open websocket"
-  [msg conn]
-  (let [body-json (json/generate-string msg)]
-    (log/debug "Sending:" msg)
-    (m/put! conn body-json)))
-
-(defn make-message-sender [conn]
-  (let [id-cache (atom 0)]
-    (fn [msg]
-      (let [id (swap! id-cache inc)
-            msg-with-id (assoc msg :id id)]
-        (send-message! msg-with-id conn)))))
-
 (defn add-emoji-response
   [emoji to-chan ts]
   (let [params {:channel to-chan
