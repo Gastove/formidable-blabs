@@ -3,6 +3,7 @@
             [cheshire.core :as json]
             [clojure.core.async :as async]
             [formidable-blabs.config :refer [blabs-config]]
+            [org.httpkit.client :as http]
             [taoensso.timbre :as log]))
 
 (defn make-slack-request
