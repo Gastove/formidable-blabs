@@ -35,7 +35,7 @@ Blabs should now be responding in your Slacks!
 ## Documentation
 
 Blabs' source is pretty well documented. You can read it directly, or you can
-checkout the online version [here](blog.gastove.com/formidable-blabs).
+checkout the online version [here](http://blog.gastove.com/formidable-blabs).
 
 ## Bugs
 
