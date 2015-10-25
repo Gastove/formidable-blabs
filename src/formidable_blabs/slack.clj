@@ -3,7 +3,6 @@
             [cheshire.core :as json]
             [clojure.core.async :as async]
             [formidable-blabs.config :refer [blabs-config]]
-            [manifold.stream :as m]
             [org.httpkit.client :as http]
             [taoensso.timbre :as log]))
 
@@ -25,27 +24,14 @@
 (defn get-ws-url []
   (make-slack-request-and-parse-body :rtm-start))
 
+;; TODO: stop connecting here, just return socket
 (defn connect-to-slack []
   (let [body (get-ws-url)
         ws-url (:url body)
         socket-stream @(aleph/websocket-client ws-url)
         chan (async/chan 10 (map #(json/parse-string % keyword)))]
-    (m/connect socket-stream chan)
-    [socket-stream chan]))
-
-(defn send-message!
-  "Sends a standard bot RTM message over an open websocket"
-  [msg conn]
-  (let [body-json (json/generate-string msg)]
-    (log/debug "Sending:" msg)
-    (m/put! conn body-json)))
-
-(defn make-message-sender [conn]
-  (let [id-cache (atom 0)]
-    (fn [msg]
-      (let [id (swap! id-cache inc)
-            msg-with-id (assoc msg :id id)]
-        (send-message! msg-with-id conn)))))
+    ;; (m/connect socket-stream chan)
+    socket-stream))
 
 (defn add-emoji-response
   [emoji to-chan ts]
