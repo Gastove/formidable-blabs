@@ -23,28 +23,32 @@
 ;; #### Commands:
 ;; Explicit orders given to the bot; usually involving calls to either the
 ;; database or the Slack API.
-;; !define -- Term definitions
-;; !whatis -- Term lookup
-;; !quote - Quote storage and search
-;; !impersonate (not yet implemented) -- Remix somebody's words
+;;
+;; - !define -- Term definitions
+;; - !whatis -- Term lookup
+;; - !quote - Quote storage and search
+;; - !impersonate (not yet implemented) -- Remix somebody's words
 ;;
 ;; #### Emotes:
 ;; Intentionally triggered actions that always return a random reaction.
-;; !wat
-;; !welp
-;; !nope
-;; !tableflip
-;; !darkglasses (not implemented)
+;;
+;; - !wat
+;; - !welp
+;; - !nope
+;; - !tableflip
+;; - !darkglasses (not implemented)
 ;;
 ;; ### Reactions:
 ;; Things the bot does on its own based on text triggers. Usually either
 ;; rate-limited, probabalistic, or both.
-;; business (not implemented)
-;; Hello / goodbye (not implemented)
-;; [wh]oops
-;; Random emotes
+;;
+;; - business (not implemented)
+;; - Hello / goodbye (not implemented)
+;; - [wh]oops
+;; - Random emotes
 
 (defn send-msg-on-channel!
+  "Put a message on the global outbound channel for processing."
   [slack-channel text]
   (go (>! outbound-channel {:type "message" :channel slack-channel :text text})))
 
@@ -59,6 +63,9 @@
 
 (declare remove-emoji-and-write! load-emoji-on-file)
 (defn random-emoji
+  "Loads known emoji from file, adds in team custom emoji from the Slack
+  API. Selects one at random, adds it as a response to a message. If the emoji
+  name isn't recognized, purges it from the known emoji list."
   [message emojis]
   (log/debug "Responding with a random emoji")
   (let [emoji (rand-nth emojis)
@@ -97,9 +104,12 @@
     (slack/post-message (:channel message) "Restarting myself!")))
 
 (defn remove-emoji-and-write!
+  "Purge an emoji from the known emoji list and update the emoji file
+  on disk."
   [emoji emojis]
   (let [new-emojis (vec (remove #{emoji} emojis))]
-    (spit (io/resource "emoji_names.edn") (with-out-str (pr {:names new-emojis})))
+    (spit (io/resource "emoji_names.edn")
+          (with-out-str (pr {:names new-emojis})))
     new-emojis))
 
 ;; ### Random Actions
