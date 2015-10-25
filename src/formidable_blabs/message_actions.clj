@@ -60,6 +60,7 @@
 (declare remove-emoji-and-write! load-emoji-on-file)
 (defn random-emoji
   [message emojis]
+  (log/debug "Responding with a random emoji")
   (let [emoji (rand-nth emojis)
         to-chan (:channel message)
         ts (:ts message)
@@ -161,8 +162,8 @@
                      (partial random-emote-by-key :oops)
                      (get-rate-limit :oops)))
 (def bam-responder (make-throttled-responder
-                     (partial random-emote-by-key :bam)
-                     0))
+                    (partial random-emote-by-key :bam)
+                    0))
 (def random-emoji-responder (make-probabalistic-responder
                              random-emoji
                              (get-probability :random-emoji)))
@@ -181,77 +182,103 @@
 
 (defn bounded-rand-int
   [lower upper]
-  (loop [n (rand-int upper)]
-    (if (< n lower)
-      (recur (rand-int upper))
-      n)))
+  (cond
+    (= lower upper) lower
+    (< (- upper lower) 100) (rand-nth (range lower upper))
+    :else (loop [n (rand-int upper)]
+            (if (< n lower)
+              (recur (rand-int upper))
+              n))))
+
+(defn extract-num-with-regex
+  ([text num-quotes r] (extract-num-with-regex text num-quotes r identity))
+  ([text num-quotes r not-found-fn]
+   (if-let [found (re-find r text)]
+     (let [parsed-int (Integer/parseInt (second found))]
+       (cond
+         (< parsed-int 1) 1
+         (> parsed-int num-quotes) num-quotes
+         :else parsed-int))
+     (not-found-fn num-quotes))))
 
 (defn extract-quote-num
   [text num-quotes]
-  (Integer/parseInt (or (second (re-find #"!q[uote]* \w+ (\d+)" text))
-                        (str (bounded-rand-int 1 num-quotes)))))
-
-(defn find-quote-for-user-or-term
-  [{:keys [text channel]}]
-  (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
-    (do (log/debug (re-find #"!q[uote]* \w+ (\d+)" text))
-        (let [result-seq (db/find-quote-by-user-or-term user-or-term)]
-          (if-not (empty? result-seq)
-           (let [num-quotes (count result-seq)
-                 n (extract-quote-num text num-quotes)
-                 ;; Vectors are zero-indexed, so nth accordingly.
-                 q (nth result-seq (- n 1) (last result-seq))
-                 {user :user quote-text :quote} q
-                 msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
-             (send-msg-on-channel! channel msg))
-           (log/debug (<< "No quote found for ~{user-or-term}")))))))
-
-(defn find-random-quote
-  [{:keys [channel]}]
-  (let [all-quotes (db/find-all-quotes)]
-    (if-not (empty? all-quotes)
-      (let [{:keys [user quote]} (rand-nth all-quotes)
-            msg (<< "~{user}: ~{quote}")]
-       (send-msg-on-channel! channel msg))
-      (send-msg-on-channel! channel "Quote DB is empty! Quote some things and try again"))))
-
-;; ### Definitions
-(defn add-definition!
-  [{:keys [text channel]}]
-  (if-let [[_ term definition] (re-find #"(?s)!define (\w+): (.+)" text)]
-    (do
-      (db/record-definition term definition)
-      (send-msg-on-channel! channel (<< "Okay! `~{term}` is now defined as, `~{definition}`")))
-    (do
-      (send-msg-on-channel! "Erk! Something went wrong. I couldn't define that.")
-      (log/error "Couldn't get a definition out of:" text))))
-
-(defn send-define-help
-  [{:keys [text channel]}]
-  (send-msg-on-channel!
-   channel
-   "I didn't get that. To define a term, use the command format, `!define term: definition`"))
+  (extract-num-with-regex text
+                          num-quotes
+                          #"!q[uote]* \w+ (\d+)"
+                          (partial bounded-rand-int 1)))
 
 (defn extract-definition-number
   [text num-defs]
-  (Integer/parseInt (or (second (re-find #"(?s)!whatis .+ (\d+)" text))
-                        (str num-defs))))
+  (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)" identity))
+
+(defn find-quote-for-user-or-term
+  ([m]
+   (find-quote-for-user-or-term m
+                                send-msg-on-channel!
+                                db/find-quote-by-user-or-term))
+  ([{:keys [text channel]} send-fn lookup-fn]
+   (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
+     (let [result-seq (lookup-fn user-or-term)]
+       (if-not (empty? result-seq)
+         (let [num-quotes (count result-seq)
+               n (extract-quote-num text num-quotes)
+               ;; Vectors are zero-indexed, so nth accordingly.
+               {user :user quote-text :quote} (nth result-seq (- n 1))
+               msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
+           (send-fn channel msg))
+         (log/debug (<< "No quote found for ~{user-or-term}")))))))
+
+(defn find-random-quote
+  ([m] (find-random-quote m send-msg-on-channel!))
+  ([{:keys [channel]} send-fn]
+   (let [all-quotes (db/find-all-quotes)]
+     (if-not (empty? all-quotes)
+       (let [{:keys [user quote]} (rand-nth all-quotes)
+             msg (<< "~{user}: ~{quote}")]
+         (send-fn channel msg))
+       (send-fn channel "Quote DB is empty! Quote some things and try again")))))
+
+;; ### Definitions
+(defn add-definition!
+  ([m] (add-definition! m send-msg-on-channel!))
+  ([{:keys [text channel]} send-fn]
+   (if-let [[_ term definition] (re-find #"(?s)!define (\w+): (.+)" text)]
+     (do
+       (db/record-definition term definition)
+       (send-fn channel (<< "Okay! `~{term}` is now defined as, `~{definition}`")))
+     (do
+       (send-fn "Erk! Something went wrong. I couldn't define that.")
+       (log/error "Couldn't get a definition out of:" text)))))
+
+(defn send-define-help
+  [{:keys [text channel]}]
+  (let [msg (str "I didn't get that. To define a term, use the command"
+                 " format, `!define term: definition`")]
+    (send-msg-on-channel! channel msg)))
 
 (defn third
   [coll]
   (nth coll 2))
 
+;; ### Definition Lookup
+;; You may be thinking, `find-defintion` looks an _awful lot_ like
+;; `find-quote-for-user-or-term` -- and you're right. The important difference
+;; is: you can define nearly anything, so the regex must match on `.+` to be
+;; sure of getting everything -- which means, `term` needs to be parsed out with
+;; `second`. Haven't figured out _quite_ how to abstract this all together yet.
 (defn find-definition
-  [{:keys [text channel]}]
-  (let [m (re-find #"(?s)!whatis (.+)\s\d+|!whatis (.+)" text)
-        term (or (second m) (third m))
-        result-seq (db/find-definiton-by-term term)
-        num-defs (count result-seq)
-        n (extract-definition-number text num-defs)
-        d (nth result-seq (- n 1) (last result-seq))
-        {defd-on :defined-at definition :definition} d
-        msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
-    (send-msg-on-channel! channel msg)))
+  ([m] (find-definition m send-msg-on-channel! db/find-definiton-by-term))
+  ([{:keys [text channel]} send-fn lookup-fn]
+   (let [m (re-find #"(?s)!whatis (.+)\s\d+|!whatis (.+)" text)
+         term (or (second m) (third m))
+         result-seq (lookup-fn term)
+         num-defs (count result-seq)
+         n (extract-definition-number text num-defs)
+         d (nth result-seq (- n 1))
+         {defd-on :defined-at definition :definition} d
+         msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
+     (send-fn channel msg))))
 
 (defn name-regex [names]
   (if (or (= names :all) (nil? names))
@@ -269,7 +296,8 @@
   (let [emotes (load-emotes)
         opt-ins (:opt-ins emotes)
         oops-users (name-regex (:oops opt-ins))
-        random-emoji-users (name-regex (:random-emoji opt-ins))
+        ;; Crud, match is compile-time literals only. This wont work like this.
+        ;; random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
@@ -287,5 +315,5 @@
            [_ #"(?s)!define \w+: .+"] (add-definition! message)
            [_ #"(?s)!define.+"] (send-define-help message)
            [_ #"(?s)!whatis .+"] (find-definition message)
-           [random-emoji-users _] (random-emoji-responder message emoji)
+           [_ _] (random-emoji-responder message emoji)
            :else (log/debug "No message action found."))))
