@@ -7,7 +7,7 @@
              [channels :refer [outbound-channel]]
              [config :refer [blabs-config]]
              [message-actions :refer [message-dispatch]]
-             [slack :refer [connect-to-slack make-message-sender]]]
+             [slack :refer [connect-to-slack]]]
             [manifold.stream :as m]
             [taoensso.timbre :as log]))
 
