@@ -165,6 +165,10 @@
         probabilities (:probabilities emotes)]
     (get probabilities k 50)))
 
+
+;; ### Responders
+;; Here's how we actually assemble the above into something that'll check
+;; timeouts and probabilities, then respond with an appropriate random reaction.
 (def omg-responder (make-throttled-responder
                     (partial random-emote-by-key :omg)
                     (get-rate-limit :omg)))
@@ -201,6 +205,9 @@
               n))))
 
 (defn extract-num-with-regex
+  "Given a text to look in and a regex that captures a number from that text,
+  parse that text and return the number as an Integer, or return a sensible
+  default."
   ([text num-quotes r] (extract-num-with-regex text num-quotes r identity))
   ([text num-quotes r not-found-fn]
    (if-let [found (re-find r text)]
@@ -297,17 +304,19 @@
 
 ;; ### Dispatcher
 ;; Matches on the combination of [username text], typically using simple string
-;; matching for username and a regexp for text.
-;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
-;; string_ matches.
+;; matching for username and a regexp for text. `_` in this context means "match
+;; everything".
+;;
+;; **Remember:** Matching is done by `re-matches`, which only matches if the _entire
+;; string_ matches. Also remember that `match` clauses **must** be static
+;; compile-time literals, so you cannot use something defined in the `let` as a
+;; regex in the match clauses -- you have to load and `def` them as symbols in the NS.
+
 (defn message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
   (let [emotes (load-emotes)
         opt-ins (:opt-ins emotes)
-        oops-users (name-regex (:oops opt-ins))
-        ;; Crud, match is compile-time literals only. This wont work like this.
-        ;; random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
