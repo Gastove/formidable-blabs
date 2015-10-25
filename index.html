@@ -2866,7 +2866,9 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>formidable-blabs -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name"><a href="http://github.com/Gastove/formidable-blabs">formidable-blabs</a></h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>Help I accidentally a Slack bot</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.7.0</td></tr><tr><td class="dep-name">jarohen/nomad</td><td class="dotted"><hr /></td><td class="dep-version">0.7.2</td></tr><tr><td class="dep-name">aleph</td><td class="dotted"><hr /></td><td class="dep-version">0.4.0</td></tr><tr><td class="dep-name">manifold</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">com.taoensso/timbre</td><td class="dotted"><hr /></td><td class="dep-version">4.1.4</td></tr><tr><td class="dep-name">org.clojure/core.match</td><td class="dotted"><hr /></td><td class="dep-version">0.3.0-alpha4</td></tr><tr><td class="dep-name">org.clojure/core.async</td><td class="dotted"><hr /></td><td class="dep-version">0.1.346.0-17112a-alpha</td></tr><tr><td class="dep-name">cheshire</td><td class="dotted"><hr /></td><td class="dep-version">5.5.0</td></tr><tr><td class="dep-name">http-kit</td><td class="dotted"><hr /></td><td class="dep-version">2.1.19</td></tr><tr><td class="dep-name">clj-time</td><td class="dotted"><hr /></td><td class="dep-version">0.11.0</td></tr><tr><td class="dep-name">org.clojure/java.jdbc</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">korma</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">org.xerial/sqlite-jdbc</td><td class="dotted"><hr /></td><td class="dep-version">3.7.2</td></tr><tr><td class="dep-name">camel-snake-kebab</td><td class="dotted"><hr /></td><td class="dep-version">0.3.2</td></tr><tr><td class="dep-name">org.clojure/core.incubator</td><td class="dotted"><hr /></td><td class="dep-version">0.1.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#formidable-blabs.channels">formidable-blabs.channels</a></li><li><a href="#formidable-blabs.config">formidable-blabs.config</a></li><li><a href="#formidable-blabs.core">formidable-blabs.core</a></li><li><a href="#formidable-blabs.db">formidable-blabs.db</a></li><li><a href="#formidable-blabs.message-actions">formidable-blabs.message-actions</a></li><li><a href="#formidable-blabs.slack">formidable-blabs.slack</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.channels" name="formidable-blabs.channels"><h1 class="project-name">formidable-blabs.channels</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.7.0</td></tr><tr><td class="dep-name">jarohen/nomad</td><td class="dotted"><hr /></td><td class="dep-version">0.7.2</td></tr><tr><td class="dep-name">aleph</td><td class="dotted"><hr /></td><td class="dep-version">0.4.0</td></tr><tr><td class="dep-name">manifold</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">com.taoensso/timbre</td><td class="dotted"><hr /></td><td class="dep-version">4.1.4</td></tr><tr><td class="dep-name">org.clojure/core.match</td><td class="dotted"><hr /></td><td class="dep-version">0.3.0-alpha4</td></tr><tr><td class="dep-name">org.clojure/core.async</td><td class="dotted"><hr /></td><td class="dep-version">0.1.346.0-17112a-alpha</td></tr><tr><td class="dep-name">cheshire</td><td class="dotted"><hr /></td><td class="dep-version">5.5.0</td></tr><tr><td class="dep-name">http-kit</td><td class="dotted"><hr /></td><td class="dep-version">2.1.19</td></tr><tr><td class="dep-name">clj-time</td><td class="dotted"><hr /></td><td class="dep-version">0.11.0</td></tr><tr><td class="dep-name">org.clojure/java.jdbc</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">korma</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">org.xerial/sqlite-jdbc</td><td class="dotted"><hr /></td><td class="dep-version">3.7.2</td></tr><tr><td class="dep-name">camel-snake-kebab</td><td class="dotted"><hr /></td><td class="dep-version">0.3.2</td></tr><tr><td class="dep-name">org.clojure/core.incubator</td><td class="dotted"><hr /></td><td class="dep-version">0.1.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#formidable-blabs.channels">formidable-blabs.channels</a></li><li><a href="#formidable-blabs.config">formidable-blabs.config</a></li><li><a href="#formidable-blabs.core">formidable-blabs.core</a></li><li><a href="#formidable-blabs.db">formidable-blabs.db</a></li><li><a href="#formidable-blabs.message-actions">formidable-blabs.message-actions</a></li><li><a href="#formidable-blabs.slack">formidable-blabs.slack</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.channels" name="formidable-blabs.channels"><h1 class="project-name">formidable-blabs.channels</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Utility NS; holds the channel other namespaces will put their outgoing
+  actions on. Isolated to it's own NS to avoid circular dependencies and ease
+  importing.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.channels
   (:require [clojure.core.async :refer [chan]]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(def outbound-channel (chan 50))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.config" name="formidable-blabs.config"><h1 class="project-name">formidable-blabs.config</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
@@ -2874,20 +2876,34 @@ net.brehaut.ClojureTools = (function (SH) {
   (:require [clojure.java.io :as io]
             [taoensso.timbre :refer [set-config! set-level!]]
             [taoensso.timbre.appenders.core :as appenders]
-            [nomad :as nomad]))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(nomad/defconfig blabs-config (io/resource &quot;config.edn&quot;))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(set-config! {:level (get-in (blabs-config) [:logging :level])
-              :appenders {:spit (appenders/spit-appender (get-in (blabs-config) [:logging :spit]))
-                          :print (appenders/println-appender (get-in (blabs-config) [:logging :spit]))}})</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.core" name="formidable-blabs.core"><h1 class="project-name">formidable-blabs.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+            [nomad :as nomad]))</pre></td></tr><tr><td class="docs"><p>Load configs.</p>
+</td><td class="codes"><pre class="brush: clojure">(nomad/defconfig blabs-config (io/resource &quot;config.edn&quot;))</pre></td></tr><tr><td class="docs"><p>Logging configs</p>
+</td><td class="codes"><pre class="brush: clojure">(set-config!
+ ;; Set log global log level from config file based on env.4
+ {:level (get-in (blabs-config) [:logging :level])
+  ;; Configure stdout (spit) and file (print) loggers from config file
+  :appenders {:spit (appenders/spit-appender (get-in (blabs-config) [:logging :spit]))
+              :print (appenders/println-appender (get-in (blabs-config) [:logging :print]))}})</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.core" name="formidable-blabs.core"><h1 class="project-name">formidable-blabs.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This is the main orchestration namespace. It provides a main method
+  and a <code>dispatch</code> multimethod for taking action on events from Slack,
+  as well as methods to consume from the Slack RTM API and pass
+  messages back in to it.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.core
   (:gen-class)
-  (:require [clojure.core.async :as async :refer [go-loop]]
+  (:require [cheshire.core :as json]
+            [clojure.core.async :as async :refer [go-loop]]
+            [clojure.core.strint :refer [&lt;&lt;]]
             [formidable-blabs
              [channels :refer [outbound-channel]]
              [config :refer [blabs-config]]
              [message-actions :refer [message-dispatch]]
-             [slack :refer [connect-to-slack make-message-sender]]]
-            [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs">
+             [slack :refer [connect-to-slack]]]
+            [manifold.stream :as m]
+            [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs"><h3>Event Dispatch</h3>
+
+<p>Dispatches on the <code>:type</code> key of a parsed JSON body from Slack's RTM API.
+See See https://api.slack.com/rtm for a full list of possible events, and
+more about the RTM API itself.</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmulti dispatch #(:type %))
 (defmethod dispatch &quot;hello&quot; [_] (log/info &quot;Got hello!&quot;))
 (defmethod dispatch &quot;pong&quot; [_] (log/debug &quot;Got pong.&quot;))
@@ -2897,30 +2913,71 @@ net.brehaut.ClojureTools = (function (SH) {
   ;; I'm-debugging-right-now debugging and nothing else.
   ;; (log/debug &quot;No :type key in event or event type unrecognized:&quot; event)
   )</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn consume-and-dispatch [in-ch]
-  (go-loop [body (async/&lt;! in-ch)]
-    (dispatch body)
-    (if-let [next-item (async/&lt;! in-ch)]
-      (recur next-item)
-      (log/debug &quot;Got nil on in-ch, exiting.&quot;))))</pre></td></tr><tr><td class="docs"><p>Sends outgoing messages. Sends a ping every <config> seconds in which there
+</td><td class="codes"><pre class="brush: clojure">(defn make-message-maker []
+  &quot;Makes a function which assocs a monotomically increasing integer in to a
+  message body as the `:id` of that message. Slack requires this id be a)
+  present and b) unique to a given _connection_ -- but it can be reset each
+  connection.&quot;
+  (let [id-cache (atom 0)]
+    (fn [msg]
+      (let [id (swap! id-cache inc)
+            msg-body (assoc msg :id id)]
+        (json/generate-string msg-body)))))</pre></td></tr><tr><td class="docs"><p>Parse a JSON string into a Clojure map and call dispatch on it.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn parse-and-dispatch
+  [raw-body]
+  (let [body (json/parse-string raw-body keyword)]
+    (dispatch body)))</pre></td></tr><tr><td class="docs"><p>Consume off a websocket and dispatch, then loop.</p>
+
+<p>  Throws <code>IOException</code> if it can't read off the socket.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn consume-and-dispatch
+  [socket]
+  (go-loop []
+    (if-let [raw-body @(m/take! socket)]
+      (do (parse-and-dispatch raw-body)
+          (recur))
+      (throw (java.io.IOException. &quot;take! from websocket failed&quot;)))))</pre></td></tr><tr><td class="docs"><p>Sends outgoing messages. Sends a ping every <code>config</code> seconds in which there
   hasn't been any other traffic.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn process-outbound
-  [out-ch sock]
+  [out-ch socket]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
-        send! (make-message-sender sock)]
-    (loop []
+        ping {:type &quot;ping&quot;}
+        make-message (make-message-maker)]
+    (go-loop []
       (let [timeout-ch (async/timeout ping-millis)
-            [msg from-ch] (async/alts!! [out-ch timeout-ch])
-            ping {:type &quot;ping&quot;}]
-        (cond
-          (= from-ch out-ch) (send! msg)
-          (= from-ch timeout-ch) (send! ping)))
-      (recur))))</pre></td></tr><tr><td class="docs"><p>I don't do a whole lot ... yet.</p>
+            [maybe-msg from-ch] (async/alts!! [out-ch timeout-ch])
+            msg-body (if (= from-ch out-ch) maybe-msg (do (log/debug &quot;Sending ping&quot;) ping))
+            msg (make-message msg-body)]
+        (if @(m/put! socket msg)
+          (recur)
+          (throw (java.io.IOException. &quot;put! failed on socket&quot;)))))))</pre></td></tr><tr><td class="docs"><p>Doubles backoff, up to 5 minutes.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn next-backoff
+  [last-backoff]
+  (let [five-minutes (* 60 1000 5)]
+    (if (&lt; last-backoff five-minutes)
+      (* 2 last-backoff)
+      five-minutes)))</pre></td></tr><tr><td class="docs"><p>Runs the whole works. Runs two asynchronous processes: one to consume from
+  Slack and dispatch events; one to consume from an internal channel and send
+  events to Slack. The only feedback these procs will return is to throw an
+  error, which the main thread will catch, log, and then re-connect after
+  sleeping <code>backoff</code> seconds.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn -main
   [&amp; args]
-  (let [[sock ch] (connect-to-slack)]
-    (consume-and-dispatch ch)
-    (process-outbound outbound-channel sock)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.db" name="formidable-blabs.db"><h1 class="project-name">formidable-blabs.db</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+  (loop [backoff 1000]
+    (try
+      (let [socket (connect-to-slack)]
+        ;; Receive an error thrown by either process.
+        (async/alts!! [(consume-and-dispatch socket)
+                       (process-outbound outbound-channel socket)]))
+      ;; A `NullPointerException` occurs when we can't connect to Slack
+      (catch java.lang.NullPointerException npe
+        (log/error (&lt;&lt; &quot;Couldn't re-open websocket, retrying with ~(/ backoff 1000) milliseconds of backoff&quot;)))
+      ;; `IOException` is thrown when we can't read from a websocket
+      (catch java.io.IOException ioe
+        (log/error (&lt;&lt; &quot;Caught IOException; couldn't read from websocket. Backing off ~(/ backoff 1000) seconds, then reconnecting&quot;)))
+      ;; In case of other unforseen errors.
+      (catch Exception e (log/error e)))
+    (Thread/sleep backoff)
+    (recur (next-backoff backoff))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.db" name="formidable-blabs.db"><h1 class="project-name">formidable-blabs.db</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>DB Schema; CRUD ops.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.db
   (:require [camel-snake-kebab
              [core :refer [-&gt;kebab-case-keyword -&gt;snake_case_keyword]]
@@ -2929,7 +2986,10 @@ net.brehaut.ClojureTools = (function (SH) {
             [clojure.java.jdbc :as jdbc]
             [korma
              [core :as sql :refer [defentity transform prepare select values where]]
-             [db :as db :refer [sqlite3 defdb]]]))</pre></td></tr><tr><td class="docs">
+             [db :as db :refer [sqlite3 defdb]]]))</pre></td></tr><tr><td class="docs"><h3>Schema</h3>
+
+<p>SQLite: the land of easy DB operations. Currently only two entities: <code>quotes</code>
+and <code>definitions</code>.</p>
 </td><td class="codes"><pre class="brush: clojure">(def quotes-table
   [:quotes
    [:user :text]
@@ -2941,23 +3001,24 @@ net.brehaut.ClojureTools = (function (SH) {
    [:definition :text]
    [:defined_at :text]])</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(def tables [quotes-table definitions-table])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(def db-spec (sqlite3 {:classname   &quot;org.sqlite.JDBC&quot;
-                       :subprotocol &quot;sqlite&quot;
-                       :subname     &quot;formidable_database.db&quot;}))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defdb main db-spec)</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def db-spec (sqlite3 {:subname &quot;formidable_database.db&quot;}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defdb main db-spec)</pre></td></tr><tr><td class="docs"><h3>DB Init</h3>
+
+<p>When setting up a new DB instance, call <code>setup-db!</code> to create the DB schema.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn create-table!
   [db-spec schema]
   (let [sql-statement (apply jdbc/create-table-ddl schema)]
     (jdbc/db-do-commands db-spec sql-statement)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn setup-db!
   []
-  (doall (map #(create-table! db-spec %) tables)))</pre></td></tr><tr><td class="docs"><p>converts all keys in a map to kebab-case keywords</p>
+  (doall (map #(create-table! db-spec %) tables)))</pre></td></tr><tr><td class="docs"><p>Converts all keys in a map to kebab-case
+  keywords</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- -&gt;kebab-keys
   [fields]
-  (transform-keys -&gt;kebab-case-keyword fields))</pre></td></tr><tr><td class="docs"><p>converts all keys in a map to snake-case keywords</p>
+  (transform-keys -&gt;kebab-case-keyword fields))</pre></td></tr><tr><td class="docs"><p>Converts all keys in a map to snake-case keywords</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- -&gt;snake-keys
   [fields]
-  (transform-keys -&gt;snake_case_keyword fields))</pre></td></tr><tr><td class="docs"><p>adds updated field to a map with given time</p>
+  (transform-keys -&gt;snake_case_keyword fields))</pre></td></tr><tr><td class="docs"><p>Adds updated field to a map with given time</p>
 </td><td class="codes"><pre class="brush: clojure">(defn- add-updated
   ([fields] (add-updated fields (now)))
   ([fields n] (assoc fields :defined-at n)))</pre></td></tr><tr><td class="docs">
@@ -2977,7 +3038,7 @@ net.brehaut.ClojureTools = (function (SH) {
   (sql/insert quotes (values {:user user :quote quote-text})))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn find-quote-by-user
   [u]
-  (select quotes (where {:user u})))</pre></td></tr><tr><td class="docs">
+  (select quotes (where {:user [like u]})))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn find-all-quotes
   []
   (select quotes))</pre></td></tr><tr><td class="docs">
@@ -2986,11 +3047,11 @@ net.brehaut.ClojureTools = (function (SH) {
   (select quotes (where {:quote [like (str &quot;%&quot; s &quot;%&quot;)]})))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn find-quote-by-user-or-term
   [s]
-  (select quotes (where (or {:user s}
+  (select quotes (where (or {:user [like s]}
                             {:quote [like (str &quot;%&quot; s &quot;%&quot;)]}))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn find-quote-by-string-and-user
   [u s]
-  (select quotes (where {:user u
+  (select quotes (where {:user [like u]
                          :quote [like (str &quot;%&quot; s &quot;%&quot;)]})))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.message-actions" name="formidable-blabs.message-actions"><h1 class="project-name">formidable-blabs.message-actions</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.message-actions
   (:require [clj-time.core :as time]
@@ -3016,30 +3077,39 @@ reactions.</p>
 <h4>Commands:</h4>
 
 <p>Explicit orders given to the bot; usually involving calls to either the
-database or the Slack API.
-!define -- Term definitions
-!whatis -- Term lookup
-!quote - Quote storage and search
-!impersonate (not yet implemented) -- Remix somebody's words</p>
+database or the Slack API.</p>
+
+<ul>
+<li>!define -- Term definitions</li>
+<li>!whatis -- Term lookup</li>
+<li>!quote - Quote storage and search</li>
+<li>!impersonate (not yet implemented) -- Remix somebody's words</li>
+</ul>
 
 <h4>Emotes:</h4>
 
-<p>Intentionally triggered actions that always return a random reaction.
-!wat
-!welp
-!nope
-!tableflip
-!darkglasses (not implemented)</p>
+<p>Intentionally triggered actions that always return a random reaction.</p>
+
+<ul>
+<li>!wat</li>
+<li>!welp</li>
+<li>!nope</li>
+<li>!tableflip</li>
+<li>!darkglasses (not implemented)</li>
+</ul>
 
 <h3>Reactions:</h3>
 
 <p>Things the bot does on its own based on text triggers. Usually either
-rate-limited, probabalistic, or both.
-business (not implemented)
-Hello / goodbye (not implemented)
-[wh]oops
-Random emotes</p>
-</td><td class="codes"></td></tr><tr><td class="docs">
+rate-limited, probabalistic, or both.</p>
+
+<ul>
+<li>business (not implemented)</li>
+<li>Hello / goodbye (not implemented)</li>
+<li>[wh]oops</li>
+<li>Random emotes</li>
+</ul>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Put a message on the global outbound channel for processing.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn send-msg-on-channel!
   [slack-channel text]
   (go (&gt;! outbound-channel {:type &quot;message&quot; :channel slack-channel :text text})))</pre></td></tr><tr><td class="docs"><p>Loads a set of responses by key out of resources/emotes.edn; returns a random
@@ -3049,7 +3119,9 @@ Random emotes</p>
   (let [flips (k emotes)
         flip (rand-nth flips)
         to-chan (:channel message)]
-    (send-msg-on-channel! to-chan flip)))</pre></td></tr><tr><td class="docs">
+    (send-msg-on-channel! to-chan flip)))</pre></td></tr><tr><td class="docs"><p>Loads known emoji from file, adds in team custom emoji from the Slack
+  API. Selects one at random, adds it as a response to a message. If the emoji
+  name isn't recognized, purges it from the known emoji list.</p>
 </td><td class="codes"><pre class="brush: clojure">(declare remove-emoji-and-write! load-emoji-on-file)
 (defn random-emoji
   [message emojis]
@@ -3085,11 +3157,13 @@ Random emotes</p>
               (recur emojis))))))
     (log/debug &quot;Finished.&quot;)
     (Thread/sleep 5000)
-    (slack/post-message (:channel message) &quot;Restarting myself!&quot;)))</pre></td></tr><tr><td class="docs">
+    (slack/post-message (:channel message) &quot;Restarting myself!&quot;)))</pre></td></tr><tr><td class="docs"><p>Purge an emoji from the known emoji list and update the emoji file
+  on disk.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn remove-emoji-and-write!
   [emoji emojis]
   (let [new-emojis (vec (remove #{emoji} emojis))]
-    (spit (io/resource &quot;emoji_names.edn&quot;) (with-out-str (pr {:names new-emojis})))
+    (spit (io/resource &quot;emoji_names.edn&quot;)
+          (with-out-str (pr {:names new-emojis})))
     new-emojis))</pre></td></tr><tr><td class="docs"><h3>Random Actions</h3>
 
 <p>Given a percent chance in 100 an action should occur, conditionally do the
@@ -3135,7 +3209,10 @@ called no more than every throttle-seconds seconds.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn get-probability [k]
   (let [emotes (load-emotes)
         probabilities (:probabilities emotes)]
-    (get probabilities k 50)))</pre></td></tr><tr><td class="docs">
+    (get probabilities k 50)))</pre></td></tr><tr><td class="docs"><h3>Responders</h3>
+
+<p>Here's how we actually assemble the above into something that'll check
+timeouts and probabilities, then respond with an appropriate random reaction.</p>
 </td><td class="codes"><pre class="brush: clojure">(def omg-responder (make-throttled-responder
                     (partial random-emote-by-key :omg)
                     (get-rate-limit :omg)))
@@ -3167,7 +3244,9 @@ called no more than every throttle-seconds seconds.</p>
     :else (loop [n (rand-int upper)]
             (if (&lt; n lower)
               (recur (rand-int upper))
-              n))))</pre></td></tr><tr><td class="docs">
+              n))))</pre></td></tr><tr><td class="docs"><p>Given a text to look in and a regex that captures a number from that text,
+  parse that text and return the number as an Integer, or return a sensible
+  default.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn extract-num-with-regex
   ([text num-quotes r] (extract-num-with-regex text num-quotes r identity))
   ([text num-quotes r not-found-fn]
@@ -3251,21 +3330,21 @@ sure of getting everything -- which means, <code>term</code> needs to be parsed 
 </td><td class="codes"><pre class="brush: clojure">(defn name-regex [names]
   (if (or (= names :all) (nil? names))
     #&quot;(?s).+&quot;
-    (re-pattern (str/join \| names))))</pre></td></tr><tr><td class="docs"><p>Uses regex matching to take a specified action on text.</p>
-
-<h3>Dispatcher</h3>
+    (re-pattern (str/join \| names))))</pre></td></tr><tr><td class="docs"><h3>Dispatcher</h3>
 
 <p>Matches on the combination of [username text], typically using simple string
-matching for username and a regexp for text.
-<strong>Remember:</strong> Matching is done by `re-matches', which only matches if the _entire
-string_ matches.</p>
+matching for username and a regexp for text. <code>_</code> in this context means "match
+everything".</p>
+
+<p><strong>Remember:</strong> Matching is done by <code>re-matches</code>, which only matches if the _entire
+string_ matches. Also remember that <code>match</code> clauses <strong>must</strong> be static
+compile-time literals, so you cannot use something defined in the <code>let</code> as a
+regex in the match clauses -- you have to load and <code>def</code> them as symbols in the NS.</p>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Uses regex matching to take a specified action on text.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn message-dispatch
   [{:keys [user text] :as message :or {text &quot;&quot; user &quot;&quot;}}]
   (let [emotes (load-emotes)
         opt-ins (:opt-ins emotes)
-        oops-users (name-regex (:oops opt-ins))
-        ;; Crud, match is compile-time literals only. This wont work like this.
-        ;; random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
@@ -3290,7 +3369,6 @@ string_ matches.</p>
             [cheshire.core :as json]
             [clojure.core.async :as async]
             [formidable-blabs.config :refer [blabs-config]]
-            [manifold.stream :as m]
             [org.httpkit.client :as http]
             [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn make-slack-request
@@ -3307,25 +3385,14 @@ string_ matches.</p>
    (let [resp (make-slack-request endpoint params)]
      (json/parse-string (:body resp) keyword))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn get-ws-url []
-  (make-slack-request-and-parse-body :rtm-start))</pre></td></tr><tr><td class="docs">
+  (make-slack-request-and-parse-body :rtm-start))</pre></td></tr><tr><td class="docs"><p>TODO: stop connecting here, just return socket</p>
 </td><td class="codes"><pre class="brush: clojure">(defn connect-to-slack []
   (let [body (get-ws-url)
         ws-url (:url body)
         socket-stream @(aleph/websocket-client ws-url)
         chan (async/chan 10 (map #(json/parse-string % keyword)))]
-    (m/connect socket-stream chan)
-    [socket-stream chan]))</pre></td></tr><tr><td class="docs"><p>Sends a standard bot RTM message over an open websocket</p>
-</td><td class="codes"><pre class="brush: clojure">(defn send-message!
-  [msg conn]
-  (let [body-json (json/generate-string msg)]
-    (log/debug &quot;Sending:&quot; msg)
-    (m/put! conn body-json)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn make-message-sender [conn]
-  (let [id-cache (atom 0)]
-    (fn [msg]
-      (let [id (swap! id-cache inc)
-            msg-with-id (assoc msg :id id)]
-        (send-message! msg-with-id conn)))))</pre></td></tr><tr><td class="docs">
+    ;; (m/connect socket-stream chan)
+    socket-stream))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn add-emoji-response
   [emoji to-chan ts]
   (let [params {:channel to-chan
