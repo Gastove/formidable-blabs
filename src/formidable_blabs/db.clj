@@ -1,4 +1,5 @@
 (ns formidable-blabs.db
+  "DB Schema; CRUD ops."
   (:require [camel-snake-kebab
              [core :refer [->kebab-case-keyword ->snake_case_keyword]]
              [extras :refer [transform-keys]]]
@@ -8,6 +9,9 @@
              [core :as sql :refer [defentity transform prepare select values where]]
              [db :as db :refer [sqlite3 defdb]]]))
 
+;; ### Schema
+;; SQLite: the land of easy DB operations. Currently only two entities: `quotes`
+;; and `definitions`.
 (def quotes-table
   [:quotes
    [:user :text]
@@ -22,12 +26,12 @@
 
 (def tables [quotes-table definitions-table])
 
-(def db-spec (sqlite3 {:classname   "org.sqlite.JDBC"
-                       :subprotocol "sqlite"
-                       :subname     "formidable_database.db"}))
+(def db-spec (sqlite3 {:subname "formidable_database.db"}))
 
 (defdb main db-spec)
 
+;; ### DB Init
+;; When setting up a new DB instance, call `setup-db!` to create the DB schema.
 (defn create-table!
   [db-spec schema]
   (let [sql-statement (apply jdbc/create-table-ddl schema)]
@@ -38,17 +42,18 @@
   (doall (map #(create-table! db-spec %) tables)))
 
 (defn- ->kebab-keys
-  "converts all keys in a map to kebab-case keywords"
+  "Converts all keys in a map to kebab-case
+  keywords"
   [fields]
   (transform-keys ->kebab-case-keyword fields))
 
 (defn- ->snake-keys
-  "converts all keys in a map to snake-case keywords"
+  "Converts all keys in a map to snake-case keywords"
   [fields]
   (transform-keys ->snake_case_keyword fields))
 
 (defn- add-updated
-  "adds updated field to a map with given time"
+  "Adds updated field to a map with given time"
   ([fields] (add-updated fields (now)))
   ([fields n] (assoc fields :defined-at n)))
 
@@ -73,7 +78,7 @@
 
 (defn find-quote-by-user
   [u]
-  (select quotes (where {:user u})))
+  (select quotes (where {:user [like u]})))
 
 (defn find-all-quotes
   []
@@ -85,10 +90,10 @@
 
 (defn find-quote-by-user-or-term
   [s]
-  (select quotes (where (or {:user s}
+  (select quotes (where (or {:user [like s]}
                             {:quote [like (str "%" s "%")]}))))
 
 (defn find-quote-by-string-and-user
   [u s]
-  (select quotes (where {:user u
+  (select quotes (where {:user [like u]
                          :quote [like (str "%" s "%")]})))
