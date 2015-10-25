@@ -23,28 +23,32 @@
 ;; #### Commands:
 ;; Explicit orders given to the bot; usually involving calls to either the
 ;; database or the Slack API.
-;; !define -- Term definitions
-;; !whatis -- Term lookup
-;; !quote - Quote storage and search
-;; !impersonate (not yet implemented) -- Remix somebody's words
+;;
+;; - !define -- Term definitions
+;; - !whatis -- Term lookup
+;; - !quote - Quote storage and search
+;; - !impersonate (not yet implemented) -- Remix somebody's words
 ;;
 ;; #### Emotes:
 ;; Intentionally triggered actions that always return a random reaction.
-;; !wat
-;; !welp
-;; !nope
-;; !tableflip
-;; !darkglasses (not implemented)
+;;
+;; - !wat
+;; - !welp
+;; - !nope
+;; - !tableflip
+;; - !darkglasses (not implemented)
 ;;
 ;; ### Reactions:
 ;; Things the bot does on its own based on text triggers. Usually either
 ;; rate-limited, probabalistic, or both.
-;; business (not implemented)
-;; Hello / goodbye (not implemented)
-;; [wh]oops
-;; Random emotes
+;;
+;; - business (not implemented)
+;; - Hello / goodbye (not implemented)
+;; - [wh]oops
+;; - Random emotes
 
 (defn send-msg-on-channel!
+  "Put a message on the global outbound channel for processing."
   [slack-channel text]
   (go (>! outbound-channel {:type "message" :channel slack-channel :text text})))
 
@@ -59,6 +63,9 @@
 
 (declare remove-emoji-and-write! load-emoji-on-file)
 (defn random-emoji
+  "Loads known emoji from file, adds in team custom emoji from the Slack
+  API. Selects one at random, adds it as a response to a message. If the emoji
+  name isn't recognized, purges it from the known emoji list."
   [message emojis]
   (log/debug "Responding with a random emoji")
   (let [emoji (rand-nth emojis)
@@ -97,9 +104,12 @@
     (slack/post-message (:channel message) "Restarting myself!")))
 
 (defn remove-emoji-and-write!
+  "Purge an emoji from the known emoji list and update the emoji file
+  on disk."
   [emoji emojis]
   (let [new-emojis (vec (remove #{emoji} emojis))]
-    (spit (io/resource "emoji_names.edn") (with-out-str (pr {:names new-emojis})))
+    (spit (io/resource "emoji_names.edn")
+          (with-out-str (pr {:names new-emojis})))
     new-emojis))
 
 ;; ### Random Actions
@@ -155,6 +165,10 @@
         probabilities (:probabilities emotes)]
     (get probabilities k 50)))
 
+
+;; ### Responders
+;; Here's how we actually assemble the above into something that'll check
+;; timeouts and probabilities, then respond with an appropriate random reaction.
 (def omg-responder (make-throttled-responder
                     (partial random-emote-by-key :omg)
                     (get-rate-limit :omg)))
@@ -191,6 +205,9 @@
               n))))
 
 (defn extract-num-with-regex
+  "Given a text to look in and a regex that captures a number from that text,
+  parse that text and return the number as an Integer, or return a sensible
+  default."
   ([text num-quotes r] (extract-num-with-regex text num-quotes r identity))
   ([text num-quotes r not-found-fn]
    (if-let [found (re-find r text)]
@@ -287,17 +304,19 @@
 
 ;; ### Dispatcher
 ;; Matches on the combination of [username text], typically using simple string
-;; matching for username and a regexp for text.
-;; **Remember:** Matching is done by `re-matches', which only matches if the _entire
-;; string_ matches.
+;; matching for username and a regexp for text. `_` in this context means "match
+;; everything".
+;;
+;; **Remember:** Matching is done by `re-matches`, which only matches if the _entire
+;; string_ matches. Also remember that `match` clauses **must** be static
+;; compile-time literals, so you cannot use something defined in the `let` as a
+;; regex in the match clauses -- you have to load and `def` them as symbols in the NS.
+
 (defn message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
   (let [emotes (load-emotes)
         opt-ins (:opt-ins emotes)
-        oops-users (name-regex (:oops opt-ins))
-        ;; Crud, match is compile-time literals only. This wont work like this.
-        ;; random-emoji-users (name-regex (:random-emoji opt-ins))
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]

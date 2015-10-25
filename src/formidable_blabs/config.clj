@@ -4,9 +4,13 @@
             [taoensso.timbre.appenders.core :as appenders]
             [nomad :as nomad]))
 
+;; Load configs.
 (nomad/defconfig blabs-config (io/resource "config.edn"))
 
-
-(set-config! {:level (get-in (blabs-config) [:logging :level])
-              :appenders {:spit (appenders/spit-appender (get-in (blabs-config) [:logging :spit]))
-                          :print (appenders/println-appender (get-in (blabs-config) [:logging :spit]))}})
+;; Logging configs
+(set-config!
+ ;; Set log global log level from config file based on env.4
+ {:level (get-in (blabs-config) [:logging :level])
+  ;; Configure stdout (spit) and file (print) loggers from config file
+  :appenders {:spit (appenders/spit-appender (get-in (blabs-config) [:logging :spit]))
+              :print (appenders/println-appender (get-in (blabs-config) [:logging :print]))}})
