@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [cheshire.core :as json]
             [clojure.core.async :as async :refer [go-loop]]
+            [clojure.core.strint :refer [<<]]
             [formidable-blabs
              [channels :refer [outbound-channel]]
              [config :refer [blabs-config]]
@@ -31,38 +32,59 @@
   ;; (log/debug "No :type key in event or event type unrecognized:" event)
   )
 
-(defn consume-and-dispatch [socket]
-  (try
-    (go-loop []
-      (if-let [raw-body @(m/take! socket)]
-        (let [body (json/parse-string raw-body keyword)]
-          (dispatch body)
+(defn parse-and-dispatch
+  [raw-body]
+  (let [body (json/parse-string raw-body keyword)]
+    (dispatch body)))
+
+(defn consume-and-dispatch
+  [socket]
+  (go-loop []
+    (if-let [raw-body @(m/take! socket)]
+      (do (parse-and-dispatch raw-body)
           (recur))
-        (log/debug "take! from websocket failed, exiting.")))
-    (catch Exception e e)))
+      (throw (java.io.IOException. "take! from websocket failed")))))
+
+(defn make-message-maker []
+  (let [id-cache (atom 0)]
+    (fn [msg]
+      (let [id (swap! id-cache inc)
+            msg-body (assoc msg :id id)]
+        (json/generate-string msg-body)))))
 
 (defn process-outbound
   "Sends outgoing messages. Sends a ping every <config> seconds in which there
   hasn't been any other traffic."
   [out-ch socket]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
-        send! (make-message-sender socket)
-        send-ping! #(send! {:type "ping"})]
-    (loop []
+        ping {:type "ping"}
+        make-message (make-message-maker)]
+    (go-loop []
       (let [timeout-ch (async/timeout ping-millis)
-            [msg from-ch] (async/alts!! [out-ch timeout-ch])]
-        (cond
-          (= from-ch out-ch) (send! msg)
-          (= from-ch timeout-ch) (send-ping!)))
-      (recur))))
+            [maybe-msg from-ch] (async/alts!! [out-ch timeout-ch])
+            msg-body (if (= from-ch out-ch) maybe-msg (do (log/debug "Sending ping") ping))
+            msg (make-message msg-body)]
+        (if @(m/put! socket msg)
+          (recur)
+          (throw (java.io.IOException. "put! failed on socket")))))))
+
+(defn next-backoff
+  [last-backoff]
+  (let [five-minutes (* 60 1000 5)]
+    (if (< last-backoff five-minutes)
+      (* 2 last-backoff)
+      five-minutes)))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (loop []
+  (loop [backoff 1000]
     (try
       (let [socket (connect-to-slack)]
-        (consume-and-dispatch socket)
-        (process-outbound outbound-channel socket))
+        (throw (async/alts!! [(consume-and-dispatch socket)
+                              (process-outbound outbound-channel socket)])))
+      (catch java.lang.NullPointerException e
+        (log/error (<< "Couldn't re-open websocket, retrying with ~(/ backoff 1000) milliseconds of backoff")))
       (catch Exception e (log/error e)))
-    (recur)))
+    (Thread/sleep backoff)
+    (recur (next-backoff backoff))))
