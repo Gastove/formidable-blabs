@@ -320,10 +320,12 @@
         emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (match [username text]
+           [_ #"!boo\s hoo\s*|boo-hoo"] (random-emote-by-key :boohoo message emotes)
            [_ #"!wat\s*"] (random-emote-by-key :wat message emotes)
            [_ #"!unicorns\s*"] (random-emote-by-key :unicorns message emotes)
            [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
            [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
+           [_ #"!no\s idea\s*"] (random-emote-by-key :noidea message emotes)
            [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
            [_ #"(?i)[z?omf?g ]+\s*"] (omg-responder message emotes)
            [_ #"(?i)[wh]*oops|uh-oh"] (oops-responder message emotes)
