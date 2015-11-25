@@ -186,7 +186,7 @@
 ;; Add a quote, search a quote by term, search a quote and return a specific result
 (defn add-quote!
   [{:keys [text channel]}]
-  (if-let [[_ user quote-text] (re-find #"(?s)!q[uote]* add (\w+) (.+)" text)]
+  (if-let [[_ user quote-text] (re-find #"(?s)!q[uote]* add ([\w\.-]+) (.+)" text)]
     (do
       (db/record-quote user quote-text)
       (send-msg-on-channel! channel "Quote added!"))
@@ -235,7 +235,7 @@
                                 send-msg-on-channel!
                                 db/find-quote-by-user-or-term))
   ([{:keys [text channel]} send-fn lookup-fn]
-   (if-let [[_ user-or-term] (re-find #"!q[uote]* (\w+)" text)]
+   (if-let [[_ user-or-term] (re-find #"!q[uote]* ([\w\.-]+)" text)]
      (let [result-seq (lookup-fn user-or-term)]
        (if-not (empty? result-seq)
          (let [num-quotes (count result-seq)
