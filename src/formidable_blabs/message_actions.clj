@@ -310,9 +310,74 @@
 ;; **Remember:** Matching is done by `re-matches`, which only matches if the _entire
 ;; string_ matches. Also remember that `match` clauses **must** be static
 ;; compile-time literals, so you cannot use something defined in the `let` as a
-;; regex in the match clauses -- you have to load and `def` them as symbols in the NS.
+;; regex in the match clauses -- you have to load and `def` them as symbols in
+;; the NS.
+
+(defmulti dispatch-action :action)
+(defmethod dispatch-action :random-emote-by-key
+  [[_ emote-key message emotes]]
+  (println "YATTA! Random emote!")
+  ;; (random-emote-by-key emote-key message emotes)
+  )
+(defmethod dispatch-action :send-message
+  [args]
+  (println "Got send message!"))
+
+(defn load-match-clauses []
+  (edn/read-string (slurp (io/resource "commands.edn"))))
+
+(defn build-match-clause
+  [{:keys [user command] :as args-map}]
+  (let [username-re-str (if (= "*" user) "(?s).+" user)
+        username-re (re-pattern username-re-str)
+        command-re (re-pattern command)
+        pass-on-args (dissoc args-map :user :command)]
+    [[username-re command-re] pass-on-args]))
+
+(defn build-match-clauses [raw-clauses]
+  (reduce concat (for [raw-clause raw-clauses
+                       :let [clause (build-match-clause raw-clause)]]
+                   clause)))
+
+
+(defmacro make-matcher []
+  (let [raw-clauses (load-match-clauses)
+        clauses# (build-match-clauses raw-clauses)]
+    `(fn [username# text#]
+       (match [username# text#]
+              ~@clauses#
+              ;; [_ #"!wat\s*"] (random-emote-by-key :wat message emotes)
+              [_# #"!wat\s*"] [:random-emote-by-key :wat]
+              ;; [_ #"!unicorns\s*"] (random-emote-by-key :unicorns message emotes)
+              ;; [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
+              ;; [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
+              ;; [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
+              ;; [_ #"(?i)[z?omf?g ]+\s*"] (omg-responder message emotes)
+              ;; [_ #"(?i)[wh]*oops|uh-oh"] (oops-responder message emotes)
+              ;; [_ #"(?i)!?bam!?"] (bam-responder message emotes)
+              ;; [_ #"(?s)!q[uote]* add [\w\.-]+:? .+"] (add-quote! message)
+              ;; [_ #"!q[uote]* \S+\s?\d*"] (find-quote-for-user-or-term message)
+              ;; [_ #"!q[uote]*"] (find-random-quote message)
+              ;; [_ #"(?s)!define \w+: .+"] (add-definition! message)
+              ;; [_ #"(?s)!define.+"] (send-define-help message)
+              ;; [_ #"(?s)!whatis .+"] (find-definition message)
+              ;; [_ _] (random-emoji-responder message emoji)
+              :else (log/debug "No message action found.")
+              ))))
+
+(def matcher (make-matcher))
 
 (defn message-dispatch
+  "Uses regex matching to take a specified action on text."
+  [{:keys [user text] :as message :or {text "" user ""}}]
+  (let [emotes (load-emotes)
+        opt-ins (:opt-ins emotes)
+        emoji (load-all-emoji)
+        username (slack/get-user-name user)
+        match-result (matcher username text)]
+    (dispatch-action match-result)))
+
+(defn old-message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
   (let [emotes (load-emotes)
@@ -335,4 +400,5 @@
            [_ #"(?s)!define.+"] (send-define-help message)
            [_ #"(?s)!whatis .+"] (find-definition message)
            [_ _] (random-emoji-responder message emoji)
-           :else (log/debug "No message action found."))))
+           :else (log/debug "No message action found.")
+           )))
