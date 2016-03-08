@@ -1,18 +1,22 @@
 ;; Configure commands
 ;; Each configuration is a map of at least two keys:
 ;;
-;; - :command -- the text in Slack that Blabs should respond to
+;; - :command -- the text in Slack that Blabs should respond to. Note that this
+;;   will be compiled in to a regex, and so any valid Clojure regex string can
+;;   be used, but will require escaped \-es (e.g. "\\s").
 ;; - :action -- the action key Blabs will use internally to dispatch a response
 ;;
-;; Each map can optinoally specify two additional keys:
+;; Each map can optionally specify two additional keys:
 ;;
 ;; - :user -- set the action to only respond to a user names which match a
 ;;    specific regex. Defaults to "(?s).+" (match all user names)
 ;; - :action-args -- some actions take additional configuration, provided in
 ;;   this key.
+;;
 [
  {:command "(?s).+@interns.+" :action :send-message :action-args "@gastove"}
  {:command "(?s).+@mentors.+" :action :send-message :action-args "Also @gastove"}
+ {:command "!wat\\s*" :action :random-emote-by-key :action-args :wat}
  {:command "!unicorns\\s*" :action :random-emote-by-key :action-args :unicorns}
  {:command "!welp\\s*" :action :random-emote-by-key :action-args :welp}
  {:command "!nope\\s*" :action :random-emote-by-key :action-args :nope}
