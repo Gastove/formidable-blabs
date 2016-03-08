@@ -6,6 +6,8 @@
             [org.httpkit.client :as http]
             [taoensso.timbre :as log]))
 
+(def self (atom ""))
+
 (defn make-slack-request
   ([endpoint] (make-slack-request endpoint {}))
   ([endpoint params]
@@ -24,13 +26,16 @@
 (defn get-ws-url []
   (make-slack-request-and-parse-body :rtm-start))
 
-;; TODO: stop connecting here, just return socket
 (defn connect-to-slack []
   (let [body (get-ws-url)
+        self-map (:self body)
         ws-url (:url body)
         socket-stream @(aleph/websocket-client ws-url)
         chan (async/chan 10 (map #(json/parse-string % keyword)))]
-    ;; (m/connect socket-stream chan)
+    ;; Store info about the current bot user
+    (swap! self (fn [x] self-map))
+
+    ;; Return the socket
     socket-stream))
 
 (defn add-emoji-response
