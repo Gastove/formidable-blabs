@@ -315,13 +315,29 @@
 
 (defmulti dispatch-action :action)
 (defmethod dispatch-action :random-emote-by-key
-  [[_ emote-key message emotes]]
-  (println "YATTA! Random emote!")
-  ;; (random-emote-by-key emote-key message emotes)
-  )
+  [{:keys [msg emotes action-args] :or {:action-args ""}}]
+  (log/debug "Dispatching a random emote!")
+  (random-emote-by-key action-args msg emotes))
+
 (defmethod dispatch-action :send-message
+  [{:keys [msg emotes action-args] :or {:action-args ""}}]
+  (send-msg-on-channel! (:channel msg) action-args))
+
+(defmethod dispatch-action :add-definition
+  [args])
+(defmethod dispatch-action :send-message [args])
+(defmethod dispatch-action :find-quote-for-user-or-term [args])
+(defmethod dispatch-action :oops-responder [args])
+(defmethod dispatch-action :find-random-quote [args])
+(defmethod dispatch-action :bam-responder [args])
+(defmethod dispatch-action :add-quote [args])
+
+(defmethod dispatch-action :send-define-help [args])
+(defmethod dispatch-action :omg-responder [args])
+(defmethod dispatch-action :find-definition [args])
+(defmethod dispatch-action :default
   [args]
-  (println "Got send message!"))
+  (log/info "No dispatch clause found for:" args))
 
 (defn load-match-clauses []
   (edn/read-string (slurp (io/resource "commands.edn"))))
@@ -343,7 +359,10 @@
   (let [raw-clauses (load-match-clauses)
         clauses# (build-match-clauses raw-clauses)]
     `(fn [username# text#]
-       (match [username# text#] ~@clauses#))))
+       (match [username# text#]
+              ~@clauses#
+              :else (log/debug "No message action found."))
+       )))
 
 (def matcher (make-matcher))
 
@@ -353,9 +372,10 @@
   (let [emotes (load-emotes)
         opt-ins (:opt-ins emotes)
         emoji (load-all-emoji)
-        username (slack/get-user-name user)
-        match-result (matcher username text)]
-    (dispatch-action match-result)))
+        username (slack/get-user-name user)]
+    (if-let [match-result (matcher username text)]
+      (dispatch-action (assoc match-result :msg message :emotes emotes))
+      (log/debug "No match made for text:" text))))
 
 (defn old-message-dispatch
   "Uses regex matching to take a specified action on text."
