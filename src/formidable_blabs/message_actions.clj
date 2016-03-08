@@ -314,6 +314,7 @@
 ;; the NS.
 
 (defmulti dispatch-action :action)
+
 (defmethod dispatch-action :random-emote-by-key
   [{:keys [msg emotes action-args] :or {:action-args ""}}]
   (log/debug "Dispatching a random emote!")
@@ -323,18 +324,41 @@
   [{:keys [msg emotes action-args] :or {:action-args ""}}]
   (send-msg-on-channel! (:channel msg) action-args))
 
-(defmethod dispatch-action :add-definition
-  [args])
-(defmethod dispatch-action :send-message [args])
-(defmethod dispatch-action :find-quote-for-user-or-term [args])
-(defmethod dispatch-action :oops-responder [args])
-(defmethod dispatch-action :find-random-quote [args])
-(defmethod dispatch-action :bam-responder [args])
-(defmethod dispatch-action :add-quote [args])
+;; Quote actions
+(defmethod dispatch-action :add-quote
+  [{:keys [msg]}]
+  (add-quote! msg))
 
-(defmethod dispatch-action :send-define-help [args])
-(defmethod dispatch-action :omg-responder [args])
-(defmethod dispatch-action :find-definition [args])
+(defmethod dispatch-action :find-quote-for-user-or-term
+  [{:keys [msg]}]
+  (find-quote-for-user-or-term msg))
+(defmethod dispatch-action :find-random-quote
+  [{:keys [msg]}]
+  (find-random-quote msg))
+
+;; Definition actions
+(defmethod dispatch-action :add-definition
+  [{:keys [msg]}]
+  (add-definition! msg))
+(defmethod dispatch-action :find-definition
+  [{:keys [msg]}]
+  (find-definition msg))
+(defmethod dispatch-action :send-define-help
+  [{:keys [msg]}]
+  (send-define-help msg))
+
+;; Responders
+(defmethod dispatch-action :bam-responder
+  [{:keys [msg emotes]}]
+  (bam-responder msg emotes))
+(defmethod dispatch-action :oops-responder
+  [{:keys [msg emotes]}]
+  (oops-responder msg emotes))
+(defmethod dispatch-action :omg-responder
+  [{:keys [msg emotes]}]
+  (omg-responder msg emotes))
+
+;; Default
 (defmethod dispatch-action :default
   [args]
   (log/info "No dispatch clause found for:" args))
@@ -361,6 +385,7 @@
     `(fn [username# text#]
        (match [username# text#]
               ~@clauses#
+              [_# _##] {:action :random-emoji-responder}
               :else (log/debug "No message action found."))
        )))
 
@@ -376,29 +401,3 @@
     (if-let [match-result (matcher username text)]
       (dispatch-action (assoc match-result :msg message :emotes emotes))
       (log/debug "No match made for text:" text))))
-
-(defn old-message-dispatch
-  "Uses regex matching to take a specified action on text."
-  [{:keys [user text] :as message :or {text "" user ""}}]
-  (let [emotes (load-emotes)
-        opt-ins (:opt-ins emotes)
-        emoji (load-all-emoji)
-        username (slack/get-user-name user)]
-    (match [username text]
-           [_ #"!wat\s*"] (random-emote-by-key :wat message emotes)
-           [_ #"!unicorns\s*"] (random-emote-by-key :unicorns message emotes)
-           [_ #"!welp\s*"] (random-emote-by-key :welp message emotes)
-           [_ #"!nope\s*"] (random-emote-by-key :nope message emotes)
-           [_ #"!tableflip\s*"] (random-emote-by-key :tableflip message emotes)
-           [_ #"(?i)[z?omf?g ]+\s*"] (omg-responder message emotes)
-           [_ #"(?i)[wh]*oops|uh-oh"] (oops-responder message emotes)
-           [_ #"(?i)!?bam!?"] (bam-responder message emotes)
-           [_ #"(?s)!q[uote]* add [\w\.-]+:? .+"] (add-quote! message)
-           [_ #"!q[uote]* \S+\s?\d*"] (find-quote-for-user-or-term message)
-           [_ #"!q[uote]*"] (find-random-quote message)
-           [_ #"(?s)!define \w+: .+"] (add-definition! message)
-           [_ #"(?s)!define.+"] (send-define-help message)
-           [_ #"(?s)!whatis .+"] (find-definition message)
-           [_ _] (random-emoji-responder message emoji)
-           :else (log/debug "No message action found.")
-           )))
