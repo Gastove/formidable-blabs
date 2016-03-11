@@ -1,4 +1,4 @@
-;; Configure commands
+;; Configuration commands
 ;; Each configuration is a map of at least two keys:
 ;;
 ;; - :command -- the text in Slack that Blabs should respond to. Note that this
@@ -13,6 +13,11 @@
 ;; - :action-args -- some actions take additional configuration, provided in
 ;;   this key.
 ;;
+;; This file is loaded when blabs is built and run; blabs must be fully
+;; restarted to pick up changes.
+;;
+;; For information on available actions and their configuration, see the Message
+;; Actions documentation.
 [
  {:command "(?s).+@interns.+" :action :send-message :action-args "@gastove"}
  {:command "(?s).+@mentors.+" :action :send-message :action-args "Also @gastove"}

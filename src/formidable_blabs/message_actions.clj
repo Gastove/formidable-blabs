@@ -302,18 +302,25 @@
     #"(?s).+"
     (re-pattern (str/join \| names))))
 
-;; ### Dispatcher
-;; Matches on the combination of [username text], typically using simple string
-;; matching for username and a regexp for text. `_` in this context means "match
-;; everything".
-;;
-;; **Remember:** Matching is done by `re-matches`, which only matches if the _entire
-;; string_ matches. Also remember that `match` clauses **must** be static
-;; compile-time literals, so you cannot use something defined in the `let` as a
-;; regex in the match clauses -- you have to load and `def` them as symbols in
-;; the NS.
+;; ### The Action Dispatcher
+(defmulti dispatch-action
+  " `dispatch-action' dispatches on the `:action' key of a `message-dispatch'
+  match map. While `message-dispatch' uses regex matching to see if there's an
+  action to take at all, `dispatch-action' answers the question, \"what do we do
+  with a given action?\"
 
-(defmulti dispatch-action :action)
+  Expects a map:
+  {
+  :action -- required --  the map key this function dispatches on
+  :msg -- required -- the original slack message map being responded to; required by
+    most actions to, at minimum, know what channel to post in to
+  :emotes -- optional -- for emoting actions, the list of possible emotes
+  :action-args -- optional -- additional arguments of all shapes and
+    kinds, passed to the action.
+  }"
+
+  ;; Dispatch fn:
+  :action)
 
 (defmethod dispatch-action :random-emote-by-key
   [{:keys [msg emotes action-args] :or {:action-args ""}}]
@@ -362,6 +369,19 @@
 (defmethod dispatch-action :default
   [args]
   (log/info "No dispatch clause found for:" args))
+
+;; ### Matcher
+;; Matches on the combination of [username text], using regex matching. Only one
+;; action is baked in: the `random-emoji-responder'. All the rest are loaded at
+;; compile time from a configuration file. This means that 1) what blabs
+;; responds to is fully configurable, and 2) configuration changes require a
+;; restart of blabs.
+;;
+;; **Remember:** Matching is done by `re-matches`, which only matches if the _entire
+;; string_ matches the given regex. Also remember that `match` clauses **must**
+;; be static compile-time literals, so you cannot use something defined in the
+;; `let` as a regex in the match clauses -- you have to load and `def` them
+;; as symbols in the namespace.
 
 (defn load-match-clauses []
   (edn/read-string (slurp (io/resource "commands.edn"))))
