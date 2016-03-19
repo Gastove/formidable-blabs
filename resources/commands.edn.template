@@ -1,0 +1,38 @@
+;; Configuration commands
+;; Each configuration is a map of at least two keys:
+;;
+;; - :command -- the text in Slack that Blabs should respond to. Note that this
+;;   will be compiled in to a regex, and so any valid Clojure regex string can
+;;   be used, but will require escaped \-es (e.g. "\\s").
+;; - :action -- the action key Blabs will use internally to dispatch a response
+;;
+;; Each map can optionally specify two additional keys:
+;;
+;; - :user -- set the action to only respond to a user names which match a
+;;    specific regex. Defaults to "(?s).+" (match all user names)
+;; - :action-args -- some actions take additional configuration, provided in
+;;   this key.
+;;
+;; This file is loaded when blabs is built and run; blabs must be fully
+;; restarted to pick up changes.
+;;
+;; For information on available actions and their configuration, see the Message
+;; Actions documentation.
+[
+ {:command "(?s).+@interns.+" :action :send-message :action-args "@gastove"}
+ {:command "(?s).+@mentors.+" :action :send-message :action-args "Also @gastove"}
+ {:command "!wat\\s*" :action :random-emote-by-key :action-args :wat}
+ {:command "!unicorns\\s*" :action :random-emote-by-key :action-args :unicorns}
+ {:command "!welp\\s*" :action :random-emote-by-key :action-args :welp}
+ {:command "!nope\\s*" :action :random-emote-by-key :action-args :nope}
+ {:command "!tableflip\\s*" :action :random-emote-by-key :action-args :tableflip}
+ {:command "(?i)[z?omf?g ]+\\s*" :action :omg-responder}
+ {:command "(?i)[wh]*oops|uh-oh" :action :oops-responder}
+ {:command "(?i)!?bam!?" :action :bam-responder }
+ {:command "(?s)!q[uote]* add [\\w\\.-]+:? .+" :action :add-quote }
+ {:command "!q[uote]* \\S+\\s?\\d*" :action :find-quote-for-user-or-term}
+ {:command "!q[uote]*" :action :find-random-quote}
+ {:command "(?s)!define \\w+: .+" :action :add-definition}
+ {:command "(?s)!define.+" :action :send-define-help}
+ {:command "(?s)!whatis .+" :action :find-definition}
+ ]
