@@ -1,8 +1,10 @@
 (ns formidable-blabs.slack
   (:require [aleph.http :as aleph]
             [cheshire.core :as json]
-            [clojure.core.async :as async]
-            [formidable-blabs.config :refer [blabs-config]]
+            [clojure.core.async :as async :refer [>! go]]
+            [formidable-blabs
+             [channels :refer [outbound-channel]]
+             [config :refer [blabs-config]]]
             [org.httpkit.client :as http]
             [taoensso.timbre :as log]))
 
@@ -53,16 +55,25 @@
   (go (>! outbound-channel {:type "message" :channel slack-channel :text text})))
 
 (defn post-message
-  "Posts a non-standard message over https; mostly for doing nonsense."
+  "Posts a message over the https Slack web API."
   [to-chan txt]
-  (let [cfg (:slack (blabs-config))
-        url (str (:api-url cfg) "chat.postMessage")
-        token (:api-token (:slack (blabs-config)))
-        params {:token token
-                :channel to-chan
-                :text txt}]
-    (log/debug @(http/get url {:query-params params}))))
+  (let [bot-name (get-in (blabs-config) [:bot :bot-name])
+        params {:channel to-chan
+                :text txt
+                :username bot-name}
+        response (make-slack-request-and-parse-body :post-message params)]
+    (log/debug response)
+    response))
 
+(defn open-direct-message-channel
+  [user-id]
+  (make-slack-request-and-parse-body :open-dm {:user user-id}))
+
+(defn close-direct-message-channel
+  [channel]
+  (make-slack-request-and-parse-body :close-dm {:channel channel}))
+
+;; User actions
 (defn get-info-for-user
   [user-id]
   (make-slack-request-and-parse-body :user-info {:user user-id}))
