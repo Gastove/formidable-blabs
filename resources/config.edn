@@ -3,7 +3,11 @@
          :resources {:rtm-start "rtm.start"
                      :reactions-add "reactions.add"
                      :user-info "users.info"
-                     :emoji "emoji.list"}
+                     :user-list "users.list"
+                     :emoji "emoji.list"
+                     :post-message "chat.postMessage"
+                     :open-dm "im.open"
+                     :close-dm "im.close"}
          :api-token "set me in your resources/local.edn"}
  :ping 3
  :nomad/environments {"dev" {:logging {:level :debug
@@ -14,4 +18,5 @@
                                         :spit {:fname "formidable.log"
                                                :async? true}
                                         :print {:async? true
-                                                :min-level :info}}}}}
+                                                :min-level :info}}}}
+ :bot {:bot-name "blabs"}}
