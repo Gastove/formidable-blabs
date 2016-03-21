@@ -182,7 +182,7 @@
 ;; Add a quote, search a quote by term, search a quote and return a specific result
 (defn add-quote!
   [{:keys [text channel]}]
-  (if-let [[_ user quote-text] (re-find #"(?s)!q[uote]* add ([\w\.-]+):? (.+)" text)]
+  (if-let [[_ user quote-text] (re-find #"(?s)!q[uote]* add ([\w\s\.-]+): (.+)" text)]
     (do
       (db/record-quote user quote-text)
       (send-msg-on-channel! channel "Quote added!"))
@@ -225,13 +225,13 @@
   [text num-defs]
   (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)" identity))
 
-(defn find-quote-for-user-or-term
+(defn find-quote-for-name
   ([m]
-   (find-quote-for-user-or-term m
-                                send-msg-on-channel!
-                                db/find-quote-by-user-or-term))
+   (find-quote-for-name m
+                        send-msg-on-channel!
+                        db/find-quote-by-user-or-term))
   ([{:keys [text channel]} send-fn lookup-fn]
-   (if-let [[_ user-or-term] (re-find #"!q[uote]* ([\w\.-]+)" text)]
+   (if-let [[_ user-or-term] (re-find #"!q[uote]* ([\w\s\.-]+)" text)]
      (let [result-seq (lookup-fn user-or-term)]
        (if-not (empty? result-seq)
          (let [num-quotes (count result-seq)
@@ -276,7 +276,7 @@
 
 ;; ### Definition Lookup
 ;; You may be thinking, `find-defintion` looks an _awful lot_ like
-;; `find-quote-for-user-or-term` -- and you're right. The important difference
+;; `find-quote-for-name` -- and you're right. The important difference
 ;; is: you can define nearly anything, so the regex must match on `.+` to be
 ;; sure of getting everything -- which means, `term` needs to be parsed out with
 ;; `second`. Haven't figured out _quite_ how to abstract this all together yet.
@@ -332,9 +332,9 @@
   [{:keys [msg]}]
   (add-quote! msg))
 
-(defmethod dispatch-action :find-quote-for-user-or-term
+(defmethod dispatch-action :find-quote-for-name
   [{:keys [msg]}]
-  (find-quote-for-user-or-term msg))
+  (find-quote-for-name msg))
 (defmethod dispatch-action :find-random-quote
   [{:keys [msg]}]
   (find-random-quote msg))
@@ -361,7 +361,20 @@
   [{:keys [msg emotes]}]
   (omg-responder msg emotes))
 
-;; Default
+;; Help
+(defmethod dispatch-action :start-help
+  [{:keys [msg]}]
+  (help/start-help msg))
+
+;; The actual default
+(defmethod dispatch-action :help-or-random-emoji-responder
+  [{:keys [msg emotes] :as args}]
+  (let [{:keys [user channel]} msg]
+    (if (help/should-help? user channel)
+      (help/dispatch-help args)
+      (random-emoji-responder msg emotes))))
+
+;; A fall-through, just in case, last ditch WTF default.
 (defmethod dispatch-action :default
   [args]
   (log/info "No dispatch clause found for:" args))
@@ -382,17 +395,22 @@
 (defn load-match-clauses []
   (edn/read-string (slurp (io/resource "commands.edn"))))
 
-;; TODO: compile regexes in try/catch, skip invalid regexes
 (defn build-match-clause
-  [{:keys [user command] :as args-map :or {user "(?s).+"}}]
-  (let [username-re (re-pattern user)
-        command-re (re-pattern command)
-        pass-on-args (dissoc args-map :user :command)]
-    [[username-re command-re] pass-on-args]))
+  [cmd {:keys [user regex] :as args-map :or {user "(?s).+"}}]
+  (try
+    (let [username-re (re-pattern user)
+          command-re (re-pattern regex)
+          pass-on-args (dissoc args-map :user :command)]
+      [[username-re command-re] pass-on-args])
+    (catch RuntimeException e
+      (do
+        (log/error
+         (<< "Invalid regex pattern ~{regex} for command map ~{cmd}")
+         nil)))))
 
-(defn build-match-clauses [raw-clauses]
-  (reduce concat (for [raw-clause raw-clauses
-                       :let [clause (build-match-clause raw-clause)]]
+(defn build-match-clauses [match-specs]
+  (reduce concat (for [[cmd spec] match-specs
+                       :let [clause (build-match-clause cmd spec)]]
                    clause)))
 
 (defmacro make-matcher []
@@ -401,12 +419,13 @@
     `(fn [username# text#]
        (match [username# text#]
               ~@clauses#
-              [_# _##] {:action :random-emoji-responder}
-              :else (log/debug "No message action found."))
+              [_# #"!help"] {:action :start-help}
+              :else {:action :help-or-random-emoji-responder})
        )))
 
 (def matcher (make-matcher))
 
+;; TODO: turn match-result in to a defrecord; pull useful keys in to it.
 (defn message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
