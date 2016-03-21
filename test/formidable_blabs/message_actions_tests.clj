@@ -67,17 +67,17 @@
 (def quote-strings ["Elvis: oh yeah (1/2)"
                     "Bruce: Claptu verata nekto (2/2)"])
 
-(deftest find-quote-for-user-or-term-test
+(deftest find-quote-for-name-test
   (testing "Can we get a quote for a user?"
    (let [incoming {:text "!quote Elvis" :quote "poot"}
          lookup-fn (lookup-quote-util "Elvis")
-         res (ma/find-quote-for-user-or-term incoming send-fn lookup-fn)]
+         res (ma/find-quote-for-name incoming send-fn lookup-fn)]
      ;; Make sure there is a returned quote, and it's in the list.
      (= (not (nil? (some #{(second res)} quote-strings))))))
   (testing "Can we get a quote for a user by number?"
     (let [incoming {:text "!quote Elvis 2" :quote "poot"}
           lookup-fn (lookup-quote-util "Elvis")
           expected '("poot" (second quote-strings))
-          res (ma/find-quote-for-user-or-term incoming send-fn lookup-fn)]
+          res (ma/find-quote-for-name incoming send-fn lookup-fn)]
       ;; Make sure there is a returned quote, and it's in the list.
       (= res expected))))
