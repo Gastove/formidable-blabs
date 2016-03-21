@@ -11,3 +11,4 @@ pom.xml.asc
 .hg/
 /resources/local.edn
 /formidable_database.db
+/resources/commands.edn
