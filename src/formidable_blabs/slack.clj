@@ -45,6 +45,13 @@
                 :name emoji}]
     (make-slack-request-and-parse-body :reactions-add params)))
 
+;; Sending Messages
+(defn send-msg-on-channel!
+  "Put a message on the global outbound channel for processing via the
+  WebSocket."
+  [slack-channel text]
+  (go (>! outbound-channel {:type "message" :channel slack-channel :text text})))
+
 (defn post-message
   "Posts a non-standard message over https; mostly for doing nonsense."
   [to-chan txt]

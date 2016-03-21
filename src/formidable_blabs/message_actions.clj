@@ -12,7 +12,8 @@
             [formidable-blabs
              [channels :refer [outbound-channel]]
              [db :as db]
-             [slack :as slack]]
+             [slack :as slack :refer [send-msg-on-channel!]]]
+            [formidable-blabs.message-actions.help :as help]
             [taoensso.timbre :as log]))
 
 ;; ### Message Actions
@@ -46,11 +47,6 @@
 ;; - Hello / goodbye (not implemented)
 ;; - [wh]oops
 ;; - Random emotes
-
-(defn send-msg-on-channel!
-  "Put a message on the global outbound channel for processing."
-  [slack-channel text]
-  (go (>! outbound-channel {:type "message" :channel slack-channel :text text})))
 
 (defn random-emote-by-key
   "Loads a set of responses by key out of resources/emotes.edn; returns a random
