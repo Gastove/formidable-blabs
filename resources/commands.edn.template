@@ -18,21 +18,28 @@
 ;;
 ;; For information on available actions and their configuration, see the Message
 ;; Actions documentation.
-[
- {:command "(?s).+@interns.+" :action :send-message :action-args "@gastove"}
- {:command "(?s).+@mentors.+" :action :send-message :action-args "Also @gastove"}
- {:command "!wat\\s*" :action :random-emote-by-key :action-args :wat}
- {:command "!unicorns\\s*" :action :random-emote-by-key :action-args :unicorns}
- {:command "!welp\\s*" :action :random-emote-by-key :action-args :welp}
- {:command "!nope\\s*" :action :random-emote-by-key :action-args :nope}
- {:command "!tableflip\\s*" :action :random-emote-by-key :action-args :tableflip}
- {:command "(?i)[z?omf?g ]+\\s*" :action :omg-responder}
- {:command "(?i)[wh]*oops|uh-oh" :action :oops-responder}
- {:command "(?i)!?bam!?" :action :bam-responder }
- {:command "(?s)!q[uote]* add [\\w\\.-]+:? .+" :action :add-quote }
- {:command "!q[uote]* \\S+\\s?\\d*" :action :find-quote-for-user-or-term}
- {:command "!q[uote]*" :action :find-random-quote}
- {:command "(?s)!define \\w+: .+" :action :add-definition}
- {:command "(?s)!define.+" :action :send-define-help}
- {:command "(?s)!whatis .+" :action :find-definition}
- ]
+{:tableflip {:regex "!tableflip\\s*"
+             :action :random-emote-by-key
+             :action-args :tableflip
+             :help "!tableflip at the beginning of any line prints a random tableflip ascii!"}
+ :wat {:regex "!wat\\s*"
+       :action :random-emote-by-key
+       :action-args :wat
+       :help "!wat at the beginning of any line prints a random WAT gif."}
+ :add-quote {:regex "(?s)!q[uote]* add [\\w\\s\\.-]+: .+"
+             :action :add-quote
+             :help "Syntax: !q[uote] add name: quote\nAdds a quote to the quote database under a given name.\nExample: !q add Frank Zappa: I'm the slime"}
+ :find-quote-for-name {:regex "!q[uote]* [\\w\\s\\.-]+\\s?\\d*"
+                               :action :find-quote-for-name
+                               :help "Syntax: !q[uote] name\nFinds a quote for the provided name; search is case-insensitive. If more than one quote exists for an entity, a number can be provided to select one specifically.\nExample: !q frank zappa [or] !q Frank Zappa 5"}
+ :find-random-quote {:regex "!q[uote]*"
+                     :action :find-random-quote
+                     :help "!q[uote], alone, followed by no other text, finds a random quote from all available quotes."}
+ :add-definition {:regex "(?s)!define \\w+: .+"
+                  :action :add-definition
+                  :help "Syntax: !define term: definition\nAssociates a definition with a term.\nExample: !define penguin: a little bird in a tuxedo"}
+ :find-definition {:regex "(?s)!whatis .+"
+                   :action :find-definition
+                   :help "Syntax: !whatis term\nLooks up a term in the term database.\n Example: !whatis penguin"}
+ :send-define-help {:regex "(?s)!define.+"
+                    :action :send-define-help}}
