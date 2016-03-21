@@ -65,7 +65,7 @@
       result)))
 
 (def quote-strings ["Elvis: oh yeah (1/2)"
-                    "Bruce: Claptu verata nekto (2/2)"])
+                    "Bruce: Klaatu verata nekto (2/2)"])
 
 (deftest find-quote-for-name-test
   (testing "Can we get a quote for a user?"
