@@ -3,3 +3,5 @@ lein: lein2
 jdk:
   - oraclejdk7
   - oraclejdk8
+before_script:
+  - cp resources/commands.edn.template resources/commands.edn
