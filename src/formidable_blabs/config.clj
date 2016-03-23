@@ -6,6 +6,7 @@
 
 ;; Load configs.
 (nomad/defconfig blabs-config (io/resource "config.edn"))
+(nomad/defconfig commands (io/resource "commands.edn"))
 
 ;; Logging configs
 (set-config!
