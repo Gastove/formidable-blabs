@@ -87,6 +87,16 @@
 
 (def get-user-name (memoize fetch-user-name))
 
+(defn get-info-for-user-name
+  [user-name]
+  (let [{member-info :members} (make-slack-request-and-parse-body :user-list)]
+    (first (filter (fn [m] (= user-name (:name m))) member-info))))
+
+(defn get-user-id-for-user-name
+  [user-name]
+  (let [user-info (get-info-for-user-name user-name)]
+    (:id user-info)))
+
 (defn get-custom-emoji
   []
   (let [resp (make-slack-request-and-parse-body :emoji)]
