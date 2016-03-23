@@ -11,6 +11,7 @@
             [clojure.java.io :as io]
             [formidable-blabs
              [channels :refer [outbound-channel]]
+             [config :as config]
              [db :as db]
              [slack :as slack :refer [send-msg-on-channel!]]]
             [formidable-blabs.message-actions.help :as help]
@@ -272,16 +273,15 @@
                  " format, `!define term: definition`")]
     (send-msg-on-channel! channel msg)))
 
-(defn third
-  [coll]
-  (nth coll 2))
-
 ;; ### Definition Lookup
 ;; You may be thinking, `find-defintion` looks an _awful lot_ like
 ;; `find-quote-for-name` -- and you're right. The important difference
 ;; is: you can define nearly anything, so the regex must match on `.+` to be
 ;; sure of getting everything -- which means, `term` needs to be parsed out with
 ;; `second`. Haven't figured out _quite_ how to abstract this all together yet.
+
+(defn third [coll] (nth coll 2))
+
 (defn find-definition
   ([m] (find-definition m send-msg-on-channel! db/find-definiton-by-term))
   ([{:keys [text channel]} send-fn lookup-fn]
@@ -295,6 +295,8 @@
          msg (<< "~{term}:\n> ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}")]
      (send-fn channel msg))))
 
+;; Not currently used. Does a handy thing, but unclear if it does a necessary
+;; thing.
 (defn name-regex [names]
   (if (or (= names :all) (nil? names))
     #"(?s).+"
@@ -372,7 +374,7 @@
 (defmethod dispatch-action :help-or-random-emoji-responder
   [{:keys [msg emotes] :as args}]
   (let [{:keys [user channel]} msg]
-    (if (help/should-help? user channel)
+    (if (help/should-respond-with-help? user channel)
       (help/dispatch-help args)
       (random-emoji-responder msg emotes))))
 
@@ -382,20 +384,17 @@
   (log/info "No dispatch clause found for:" args))
 
 ;; ### Matcher
-;; Matches on the combination of [username text], using regex matching. Only one
-;; action is baked in: the `random-emoji-responder'. All the rest are loaded at
-;; compile time from a configuration file. This means that 1) what blabs
-;; responds to is fully configurable, and 2) configuration changes require a
-;; restart of blabs.
+;; Matches on the combination of [username text], using regex matching. Only two
+;; actions are baked in: the `random-emoji-responder' and the help system. All
+;; the rest are loaded at compile time from a configuration file. This means
+;; that 1) what blabs responds to is fully configurable, and 2) configuration
+;; changes require a restart of blabs.
 ;;
 ;; **Remember:** Matching is done by `re-matches`, which only matches if the _entire
 ;; string_ matches the given regex. Also remember that `match` clauses **must**
 ;; be static compile-time literals, so you cannot use something defined in the
 ;; `let` as a regex in the match clauses -- you have to load and `def` them
 ;; as symbols in the namespace.
-
-(defn load-match-clauses []
-  (edn/read-string (slurp (io/resource "commands.edn"))))
 
 (defn build-match-clause
   [cmd {:keys [user regex] :as args-map :or {user "(?s).+"}}]
@@ -416,14 +415,13 @@
                    clause)))
 
 (defmacro make-matcher []
-  (let [raw-clauses (load-match-clauses)
+  (let [raw-clauses (config/commands)
         clauses# (build-match-clauses raw-clauses)]
     `(fn [username# text#]
        (match [username# text#]
               ~@clauses#
               [_# #"!help"] {:action :start-help}
-              :else {:action :help-or-random-emoji-responder})
-       )))
+              :else {:action :help-or-random-emoji-responder}))))
 
 (def matcher (make-matcher))
 
