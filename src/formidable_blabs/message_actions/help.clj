@@ -27,13 +27,6 @@
 
 (def commands-map (config/commands))
 
-(def help-channels (atom {}))
-
-(defn get-help-channel-for-user
-  [user-id]
-  (@help-channels user-id))
-
-;; Generate the topic list from the loaded commands-map
 (defn make-topic-list
   "Takes a map of commands of the format {command-name {command-spec}}
   Returns the names of every command with a :help key defined."
@@ -42,23 +35,31 @@
        (filter (fn [[_ spec]] (not (nil? (:help spec)))))
        (keys)))
 
+(def commands-by-index
+  (let [topics (make-topic-list commands-map)]
+    (into {} (map-indexed (fn [idx k] [idx k]) topics))))
+
+(def help-channels (atom {}))
+
+(defn get-help-channel-for-user
+  [user-id]
+  (@help-channels user-id))
+
 (defn format-topic-list
   "Takes the list of key names returned by `make-topic-list'.
   Returns a string of topics formatted as `[Index of topic name] topic name'"
   [topic-list]
-  (->> topic-list
-       (map name)
-       (map #(str/replace % #"\-" " "))
-       (map-indexed (fn [idx topic] (<< "[~{idx}] ~{topic}")))
-       (str/join \newline)))
+  (let [pieces (for [[idx cmd] (sort topic-list)
+                     :let [cmd-name (name cmd)
+                           cleaned-name #(str/replace % #"\-" " " cmd-name)]]
+                 (<< "[~{idx}] ~{cmd-name}"))]
+   (str/join \newline pieces)))
 
 (defn make-opening-message
   "Creates the initial message a user will receive on their DM channel with
   Blabs when they initiate a help session."
-  [commands]
-  (let [topics (-> commands
-                   (make-topic-list)
-                   (format-topic-list))
+  [indexed-command-names]
+  (let [topics (format-topic-list indexed-command-names)
         opening "Hi! What can I help you with? Here's the commands I've got:"
         closing (str "Which command would you like to know more about?"
                      "You can say a number or an exact term, or say \"done\""
@@ -71,11 +72,9 @@
   [{user-id :user}]
   (let [dm-channel-resp (slack/open-direct-message-channel user-id)
         dm-channel (get-in dm-channel-resp [:channel :id])
-        opening-message (make-opening-message commands-map)]
+        opening-message (make-opening-message commands-by-index)]
     (slack/post-message dm-channel opening-message)
     (swap! help-channels assoc user-id dm-channel)))
-
-
 
 (defn user-help-session-active?
   "Do we currently have a `user-id dm-channel' pair in the
@@ -89,7 +88,7 @@
   that users'  DM channel."
   [user-id channel]
   (and (user-help-session-active? user-id)
-       (= (@help-channels user) channel)))
+       (= (@help-channels user-id) channel)))
 
 (defn format-text-as-command-name
   "Takes a string with a name like `find quote for name'
@@ -107,11 +106,14 @@
     (<< "I'm sorry, I don't know how to help you with \"~{k}\". Try again?'")))
 
 (defn get-help-by-number [n]
+  (log/debug "Getting help by number:" n)
+  (log/debug "Commands by index is:" commands-by-index)
   (let [idx (read-string n)
-        k (nth (keys commands-map) idx)]
+        k (commands-by-index idx)]
     (load-help-by-key k)))
 
 (defn get-help-by-string [s]
+  (log/debug "Getting help by string:" s)
   (let [k (format-text-as-command-name s)]
     (load-help-by-key k)))
 
@@ -129,9 +131,9 @@
   [{message :msg}]
   (let [{:keys [user text]} message
         help-channel (get-help-channel-for-user user)]
-   (if (= text "done")
-     (end-help help-channel)
-     (let [help-text (if (number? (read-string text))
-                       (get-help-by-number text)
-                       (get-help-by-string text))]
-       (slack/send-msg-on-channel! help-channel help-text)))))
+    (if (= text "done")
+      (end-help help-channel)
+      (let [help-text (if (number? (read-string text))
+                        (get-help-by-number text)
+                        (get-help-by-string text))]
+        (slack/send-msg-on-channel! help-channel help-text)))))
