@@ -17,6 +17,36 @@
             [formidable-blabs.message-actions.help :as help]
             [taoensso.timbre :as log]))
 
+;; ### Message Action Utilities
+
+(defn load-regex-by-key
+  "Given a key k, load a command's regex from the commands config"
+  [k]
+  (let [re-str (get-in (config/commands) [k :regex])]
+    (try
+      (if-not (nil? re-str)
+        (re-pattern re-str)
+        (log/debug "No regex found for key:" k))
+      (catch RuntimeException rte
+        (log/error
+         (<< "Invalid regex pattern ~{re-str} found for key ~{k}")
+         rte)))))
+
+(defn bounded-rand-int
+  "Returns an int with the following behavior:
+  - If the lower and upper bounds are identical, return the lower bound
+  - Otherwise, return an int from the range [lower upper)"
+  [lower upper]
+  (cond
+    (= lower upper) lower
+    (< (- upper lower) 100) (rand-nth (range lower upper))
+    :else (loop [n (rand-int upper)]
+            (if (< n lower)
+              (recur (rand-int upper))
+              n))))
+
+(defn third [coll] (nth coll 2))
+
 ;; ### Message Actions
 ;; Actions based on either the sender of a message, the channel of a message,
 ;; text in a message, or all three. Divides broadly into commands, emotes, and
@@ -65,6 +95,8 @@
   name isn't recognized, purges it from the known emoji list."
   [message emojis]
   (log/debug "Responding with a random emoji")
+  (log/debug "Here are the emojis:")
+  (log/debug emojis)
   (let [emoji (rand-nth emojis)
         to-chan (:channel message)
         ts (:ts message)
@@ -183,24 +215,15 @@
 ;; Add a quote, search a quote by term, search a quote and return a specific result
 (defn add-quote!
   [{:keys [text channel]}]
-  (if-let [[_ user quote-text] (re-find #"(?s)!q[uote]* add ([A-Za-z\s\.-]+): (.+)" text)]
-    (do
-      ;; Regex currently might grab an extra space at the end of user; trim.
-      (db/record-quote (str/trim user) quote-text)
-      (send-msg-on-channel! channel "Quote added!"))
-    (do
-      (send-msg-on-channel! channel "Erk! Something didn't work. One thousand apologies.")
-      (log/error "Either user or text not found?! That's effed up:" text))))
-
-(defn bounded-rand-int
-  [lower upper]
-  (cond
-    (= lower upper) lower
-    (< (- upper lower) 100) (rand-nth (range lower upper))
-    :else (loop [n (rand-int upper)]
-            (if (< n lower)
-              (recur (rand-int upper))
-              n))))
+  (let [regex (load-regex-by-key :add-quote)]
+    (if-let [[_ user quote-text] (re-find regex text)]
+      (do
+        ;; Regex currently might grab an extra space at the end of user; trim.
+        (db/record-quote (str/trim user) quote-text)
+        (send-msg-on-channel! channel "Quote added!"))
+      (do
+        (send-msg-on-channel! channel "Erk! Something didn't work. One thousand apologies.")
+        (log/error "Either user or text not found?! That's effed up:" text)))))
 
 (defn extract-num-with-regex
   "Given a text to look in and a regex that captures a number from that text,
@@ -232,18 +255,21 @@
    (find-quote-for-name m
                         send-msg-on-channel!
                         db/find-quote-by-user-or-term))
+
+  ;; TODO: refactor this. Oye.
   ([{:keys [text channel]} send-fn lookup-fn]
-   (if-let [[_ untrimmed-name] (re-find #"!q[uote]* ([A-Za-z\s\.-]+)" text)]
-     (let [name-to-find (str/trim untrimmed-name)
-           result-seq (lookup-fn name-to-find)]
-       (if-not (empty? result-seq)
-         (let [num-quotes (count result-seq)
-               n (extract-quote-num text num-quotes)
-               ;; Vectors are zero-indexed, so nth accordingly.
-               {user :user quote-text :quote} (nth result-seq (- n 1))
-               msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
-           (send-fn channel msg))
-         (log/debug (<< "No quote found for ~{name-to-find}")))))))
+   (let [regex (load-regex-by-key :find-quote-for-name)]
+     (if-let [[_ untrimmed-name] (re-find regex text)]
+       (let [name-to-find (str/trim untrimmed-name)
+             result-seq (lookup-fn name-to-find)]
+         (if-not (empty? result-seq)
+           (let [num-quotes (count result-seq)
+                 n (extract-quote-num text num-quotes)
+                 ;; Vectors are zero-indexed, so nth accordingly.
+                 {user :user quote-text :quote} (nth result-seq (- n 1))
+                 msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
+             (send-fn channel msg))
+           (log/debug (<< "No quote found for ~{name-to-find}"))))))))
 
 (defn find-random-quote
   ([m] (find-random-quote m send-msg-on-channel!))
@@ -259,18 +285,20 @@
 (defn add-definition!
   ([m] (add-definition! m send-msg-on-channel!))
   ([{:keys [text channel]} send-fn]
-   (if-let [[_ term definition] (re-find #"(?s)!define (\w+): (.+)" text)]
-     (do
-       (db/record-definition term definition)
-       (send-fn channel (<< "Okay! `~{term}` is now defined as, `~{definition}`")))
-     (do
-       (send-fn "Erk! Something went wrong. I couldn't define that.")
-       (log/error "Couldn't get a definition out of:" text)))))
+   (let [regex (load-regex-by-key :add-definition)]
+     (if-let [[_ term definition] (re-find regex text)]
+       (do
+         (db/record-definition term definition)
+         (send-fn channel (<< "Okay! `~{term}` is now defined as, `~{definition}`")))
+       (do
+         (send-fn "Erk! Something went wrong. I couldn't define that.")
+         (log/error "Couldn't get a definition out of:" text))))))
 
 (defn send-define-help
   [{:keys [text channel]}]
-  (let [msg (str "I didn't get that. To define a term, use the command"
-                 " format, `!define term: definition`")]
+  (let [msg (str/join " "
+                      ["I didn't get that. To define a term, use the command"
+                       "format, `!define term: definition`"])]
     (send-msg-on-channel! channel msg)))
 
 ;; ### Definition Lookup
@@ -280,12 +308,11 @@
 ;; sure of getting everything -- which means, `term` needs to be parsed out with
 ;; `second`. Haven't figured out _quite_ how to abstract this all together yet.
 
-(defn third [coll] (nth coll 2))
-
 (defn find-definition
   ([m] (find-definition m send-msg-on-channel! db/find-definiton-by-term))
   ([{:keys [text channel]} send-fn lookup-fn]
-   (let [m (re-find #"(?s)!whatis (.+)\s\d+|!whatis (.+)" text)
+   (let [regex (load-regex-by-key :find-definition)
+         m (re-find regex text)
          term (or (second m) (third m))
          result-seq (lookup-fn term)
          num-defs (count result-seq)
@@ -373,10 +400,11 @@
 ;; The actual default
 (defmethod dispatch-action :help-or-random-emoji-responder
   [{:keys [msg emotes] :as args}]
-  (let [{:keys [user channel]} msg]
+  (let [{:keys [user channel]} msg
+        emoji (load-all-emoji)]
     (if (help/should-respond-with-help? user channel)
       (help/dispatch-help args)
-      (random-emoji-responder msg emotes))))
+      (random-emoji-responder msg emoji))))
 
 ;; A fall-through, just in case, last ditch WTF default.
 (defmethod dispatch-action :default
