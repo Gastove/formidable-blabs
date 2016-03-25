@@ -251,11 +251,11 @@
   (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)" identity))
 
 (defn send-nth-quote!
-  [quotes text channel]
+  [quotes text channel send-fn]
   (let [num-quotes (count quotes)
         n (extract-quote-num text num-quotes)
         ;; Vectors are zero-indexed, so nth accordingly.
-        {user :user quote-text :quote} (nth result-seq (- n 1))
+        {user :user quote-text :quote} (nth quotes (- n 1))
         msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
     (send-fn channel msg)))
 
@@ -271,7 +271,7 @@
      (let [name-to-find (str/trim untrimmed-name)
            result-seq (lookup-fn name-to-find)]
        (if-not (empty? result-seq)
-         (send-nth-quote result-seq text channel)
+         (send-nth-quote! result-seq text channel send-fn)
          (log/debug (<< "No quote found for ~{name-to-find}")))))))
 
 (defn find-random-quote
