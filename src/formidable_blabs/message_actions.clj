@@ -250,26 +250,29 @@
   [text num-defs]
   (extract-num-with-regex text num-defs #"(?s)!whatis .+ (\d+)" identity))
 
+(defn send-nth-quote!
+  [quotes text channel]
+  (let [num-quotes (count quotes)
+        n (extract-quote-num text num-quotes)
+        ;; Vectors are zero-indexed, so nth accordingly.
+        {user :user quote-text :quote} (nth result-seq (- n 1))
+        msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
+    (send-fn channel msg)))
+
 (defn find-quote-for-name
   ([m]
    (find-quote-for-name m
                         send-msg-on-channel!
-                        db/find-quote-by-user-or-term))
+                        db/find-quote-by-user-or-term
+                        (load-regex-by-key :find-quote-for-name)))
 
-  ;; TODO: refactor this. Oye.
-  ([{:keys [text channel]} send-fn lookup-fn]
-   (let [regex (load-regex-by-key :find-quote-for-name)]
-     (if-let [[_ untrimmed-name] (re-find regex text)]
-       (let [name-to-find (str/trim untrimmed-name)
-             result-seq (lookup-fn name-to-find)]
-         (if-not (empty? result-seq)
-           (let [num-quotes (count result-seq)
-                 n (extract-quote-num text num-quotes)
-                 ;; Vectors are zero-indexed, so nth accordingly.
-                 {user :user quote-text :quote} (nth result-seq (- n 1))
-                 msg (<< "~{user}: ~{quote-text} (~{n}/~{num-quotes})")]
-             (send-fn channel msg))
-           (log/debug (<< "No quote found for ~{name-to-find}"))))))))
+  ([{:keys [text channel]} send-fn lookup-fn regex]
+   (if-let [[_ untrimmed-name] (re-find regex text)]
+     (let [name-to-find (str/trim untrimmed-name)
+           result-seq (lookup-fn name-to-find)]
+       (if-not (empty? result-seq)
+         (send-nth-quote result-seq text channel)
+         (log/debug (<< "No quote found for ~{name-to-find}")))))))
 
 (defn find-random-quote
   ([m] (find-random-quote m send-msg-on-channel!))
