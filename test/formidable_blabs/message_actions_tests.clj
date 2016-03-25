@@ -70,7 +70,7 @@
 (deftest find-quote-for-name-test
   (testing "Can we get a quote for a user?"
    (let [incoming {:text "!quote Elvis" :quote "poot"}
-         lookup-fn (lookup-quote-util "Elvis)"
+         lookup-fn (lookup-quote-util "Elvis")
          regex (ma/load-regex-by-key :find-quote-for-name)
          res (ma/find-quote-for-name incoming send-fn lookup-fn regex)]
      ;; Make sure there is a returned quote, and it's in the list.
