@@ -106,14 +106,11 @@
     (<< "I'm sorry, I don't know how to help you with \"~{k}\". Try again?'")))
 
 (defn get-help-by-number [n]
-  (log/debug "Getting help by number:" n)
-  (log/debug "Commands by index is:" commands-by-index)
   (let [idx (read-string n)
         k (commands-by-index idx)]
     (load-help-by-key k)))
 
 (defn get-help-by-string [s]
-  (log/debug "Getting help by string:" s)
   (let [k (format-text-as-command-name s)]
     (load-help-by-key k)))
 
