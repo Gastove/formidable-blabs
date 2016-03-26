@@ -5,3 +5,4 @@ jdk:
   - oraclejdk8
 before_script:
   - cp resources/commands.template.edn resources/commands.edn
+  - cp resources/emotes.template.edn resources/emotes.edn
