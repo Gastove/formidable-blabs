@@ -35,25 +35,46 @@
        (filter (fn [[_ spec]] (not (nil? (:help spec)))))
        (keys)))
 
-(def commands-by-index
-  (let [topics (make-topic-list commands-map)]
-    (into {} (map-indexed (fn [idx k] [idx k]) topics))))
+(defn make-indexed-topics
+  [topics]
+  (into {} (map-indexed (fn [idx k] [idx k]) topics)))
+
+(def commands-by-index (-> commands-map
+                           (make-topic-list)
+                           (make-indexed-topics)
+                           (sort)))
+
+;; Formatting
+(defn format-text-as-command-name
+  "Takes a string with a name like `find quote for name'
+  Returns a kebab-case keyword like `:find-quote-for-name'"
+  [t]
+  (-> t
+      (str/replace #"\s" "-")
+      (keyword)))
+
+(defn format-command-key-as-text
+  "Takes a keyword like :find-quote-for-name
+  Returns text like `find quote for name'"
+  [cmd-key]
+  (-> cmd-key
+      (name)
+      (str/replace #"\-" " ")))
+
+(defn format-topic-list
+  "Takes the list of key names returned by `make-topic-list'.
+  Returns a string of topics formatted as `[Index of topic name] topic name'"
+  [topic-list]
+  (let [pieces (for [[idx cmd] topic-list
+                     :let [cmd-name (format-command-key-as-text cmd)]]
+                 (<< "[~{idx}] ~{cmd-name}"))]
+    (str/join \newline pieces)))
 
 (def help-channels (atom {}))
 
 (defn get-help-channel-for-user
   [user-id]
   (@help-channels user-id))
-
-(defn format-topic-list
-  "Takes the list of key names returned by `make-topic-list'.
-  Returns a string of topics formatted as `[Index of topic name] topic name'"
-  [topic-list]
-  (let [pieces (for [[idx cmd] (sort topic-list)
-                     :let [cmd-name (name cmd)
-                           cleaned-name #(str/replace % #"\-" " " cmd-name)]]
-                 (<< "[~{idx}] ~{cmd-name}"))]
-   (str/join \newline pieces)))
 
 (defn make-opening-message
   "Creates the initial message a user will receive on their DM channel with
@@ -89,14 +110,6 @@
   [user-id channel]
   (and (user-help-session-active? user-id)
        (= (@help-channels user-id) channel)))
-
-(defn format-text-as-command-name
-  "Takes a string with a name like `find quote for name'
-  Returns a kebab-case keyword like `:find-quote-for-name'"
-  [t]
-  (-> t
-      (str/replace #"\s" "-")
-      (keyword)))
 
 (defn load-help-by-key
   "Returns either the help text for a command, or a polite apology."
