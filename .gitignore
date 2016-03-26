@@ -12,3 +12,4 @@ pom.xml.asc
 /resources/local.edn
 /formidable_database.db
 /resources/commands.edn
+/resources/emotes.edn

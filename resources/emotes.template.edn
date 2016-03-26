@@ -1,0 +1,20 @@
+{:tableflip ["(ﾉಥ益ಥ）ﾉ﻿ ┻━┻" "┻━┻ ︵ヽ(`Д´)ﾉ︵﻿ ┻━┻" "（╯°□°）╯︵ ┻━┻"]
+ :welp ["https://media4.giphy.com/media/tpwwhv1BLd31e/200.gif"
+        "http://giphy.com/gifs/hockey-toronto-maple-leafs-I0sHoH59pYrWU"]
+ :nope ["http://wil.to/_/finn-nope.gif"]
+ :wat ["http://wil.to/_/wat.gif"
+       "http://bukk.it/iwata.gif"]
+ :omg ["https://cloud.githubusercontent.com/assets/768965/10530616/553640ee-735e-11e5-9b27-323def7c55e6.gif"
+       "https://cloud.githubusercontent.com/assets/768965/10530618/57c34d66-735e-11e5-806c-fbcf7f3439a2.gif"
+       "https://cloud.githubusercontent.com/assets/768965/10530626/65a72ae2-735e-11e5-9e0d-f53a37b28f6d.gif"
+       "https://cloud.githubusercontent.com/assets/768965/10530633/7f99b1d6-735e-11e5-8520-d5026f8170d6.gif"]
+ :oops ["https://cloud.githubusercontent.com/assets/768965/10530589/02b890ce-735e-11e5-9f74-cd733b39f7a9.gif"
+        "https://cloud.githubusercontent.com/assets/768965/10530605/31ef89b0-735e-11e5-9a78-f595b1516f53.gif"
+        "https://cloud.githubusercontent.com/assets/4452678/10530644/9dbd25da-735e-11e5-9520-6beef4e46045.gif"
+        "https://media.giphy.com/media/U5AoARCLX0S1q/giphy.gif"]
+ :unicorns ["https://cloud.githubusercontent.com/assets/768965/10530387/6a4760b4-735c-11e5-8d31-6c7b0844eeef.gif"]
+ :bam ["https://pbs.twimg.com/tweet_video/CRTz8R4WsAAhpVF.mp4"]
+ :rate-limits {:omg 10
+               :oops 30}
+ :probabilities {:random-emoji 10}
+ :opt-ins {:oops :all}}
