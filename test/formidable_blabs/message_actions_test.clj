@@ -1,4 +1,4 @@
-(ns formidable-blabs.message-actions-tests
+(ns formidable-blabs.message-actions-test
   (:require [formidable-blabs.message-actions :as ma]
             [clojure.test :as t :refer [deftest testing is]]))
 
