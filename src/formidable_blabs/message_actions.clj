@@ -79,15 +79,6 @@
 ;; - [wh]oops
 ;; - Random emotes
 
-(defn random-emote-by-key
-  "Loads a set of responses by key out of resources/emotes.edn; returns a random
-  emote"
-  [k message emotes]
-  (let [flips (k emotes)
-        flip (rand-nth flips)
-        to-chan (:channel message)]
-    (send-msg-on-channel! to-chan flip)))
-
 (declare remove-emoji-and-write! load-emoji-on-file)
 (defn random-emoji
   "Loads known emoji from file, adds in team custom emoji from the Slack
@@ -95,8 +86,6 @@
   name isn't recognized, purges it from the known emoji list."
   [message emojis]
   (log/debug "Responding with a random emoji")
-  (log/debug "Here are the emojis:")
-  (log/debug emojis)
   (let [emoji (rand-nth emojis)
         to-chan (:channel message)
         ts (:ts message)
@@ -141,39 +130,72 @@
           (with-out-str (pr {:names new-emojis})))
     new-emojis))
 
-;; ### Random Actions
-;; Given a percent chance in 100 an action should occur, conditionally do the
-;; action or pass
-(defn make-probabalistic-responder
-  [action probability]
-  (fn [& args]
-    (let [n (rand-int 99)]
-      (if (< n probability)
-        (apply action args)
-        (log/debug "Rolled an" (str "'" n "'") " probability is:" probability ", passing")))))
+(defn argenfloop
+  [{:keys [action action-args probability rate-limit] :or {:probability 100
+                                                           :rate-limit 0}}]
+  (let [last-replied (atom (time/date-time 0))
+        since-last-millis (* rate-limit 1000)
+        n (rand-int 99)
+        time? (time/after? (time/now)
+                           (time/plus @last-replied
+                                      (time/millis since-last-millis)))
 
-;; ### Rate Limits
-;; Some things shouldn't run all the time. This wrapper makes a function get
-;; called no more than every throttle-seconds seconds.
-(defn make-throttled-responder
-  "Not every response should happen every time."
-  [action throttle-seconds]
-  (let [last-replied (atom (time/date-time 0))]
-    (fn [& action-args]
-      (let [since-last-millis (* throttle-seconds 1000)]
-        (if (time/after? (time/now) (time/plus @last-replied (time/millis since-last-millis)))
-          (do (apply action action-args)
-              (swap! last-replied (fn [x] (time/now))))
-          (log/info "Not performing action yet, too soon"))))))
+        chance? (< n probability)]
+    (cond
+      time? (do (apply action action-args)
+                (swap! last-replied (fn [x] (time/now))))
+      chance? (apply action action-args)
+      :else (log/debug "No action just yet."))))
 
-;; ### Check to see if it's time to do an action; if so, check its probability.
-(defn make-probabalistic-throttled-responder
-  [action probability throttle-seconds]
-  (make-probabalistic-responder
-   (make-throttled-responder action probability) throttle-seconds))
+;; new throttling
+(def last-replied-map (atom {}))
 
-(defn load-emotes []
-  (edn/read-string (slurp (io/resource "emotes.edn") :encoding "utf-16")))
+(defn time-to-reply?
+  [last-replied throttle-millis]
+  (time/after? (time/now) (time/plus last-replied (time/millis throttle-millis))))
+
+(defn pick-and-send-random
+  [message possibilities]
+  (let [selected (rand-nth possibilities)
+        to-chan (:channel message)]
+    (send-msg-on-channel! to-chan selected)))
+
+(defn set-last-sent-and-send
+  [emote-key message possibilities]
+  (swap! last-replied-map assoc emote-key (time/now))
+  (pick-and-send-random message possibilities))
+
+(defn set-last-done-and-do
+  [emote-key action action-args]
+  (swap! last-replied-map assoc emote-key (time/now))
+  (apply action action-args))
+
+(defn respond
+  "Takes a message, an action to perform on the message, arguments to that
+  action, a probability, and a rate limit; responds if: the action isn't rate
+  limited by time or the time limit is up; the actions probability checks out.
+  Note that time takes precedence over probability."
+  [message action action-name action-args rate-limit probability]
+  (let [last-replied-time (get @last-replied-map action-name (time/date-time 0))
+        throttle-millis (* 1000 rate-limit)]
+    (cond
+      (time-to-reply? last-replied-time throttle-millis) (set-last-done-and-do action-name action action-args)
+      (< (rand-int 99) probability) (apply action action-args)
+      :else (log/debug (str "It either isn't time or the probabilities"
+                            " didn't shake out, no action yet")))))
+
+(defn respond-with-emoji
+  [message emoji rate-limit probability]
+  (respond message random-emoji :random-emoji [message emoji] rate-limit probability))
+
+(defn respond-with-random-thing
+  "Given a set of things to respond with -- emoji or gifs, for instance --
+  respond if: the action isn't rate limited by time or the time limit is up;
+  the actions probability checks out. Note that time takes precedence over
+  probability."
+  [message emote-key rate-limit probability things]
+  (respond message pick-and-send-random :emote-key [message things] rate-limit probability))
+
 
 (defn load-emoji-on-file
   []
@@ -183,33 +205,6 @@
   (let [emojis-on-file (load-emoji-on-file)
         custom-emoji (slack/get-custom-emoji)]
     (into emojis-on-file custom-emoji)))
-
-(defn get-rate-limit [k]
-  (let [emotes (load-emotes)
-        rates (:rate-limits emotes)]
-    (get rates k 10)))
-
-(defn get-probability [k]
-  (let [emotes (load-emotes)
-        probabilities (:probabilities emotes)]
-    (get probabilities k 50)))
-
-
-;; ### Responders
-;; Here's how we actually assemble the above into something that'll check
-;; timeouts and probabilities, then respond with an appropriate random reaction.
-(def omg-responder (make-throttled-responder
-                    (partial random-emote-by-key :omg)
-                    (get-rate-limit :omg)))
-(def oops-responder (make-throttled-responder
-                     (partial random-emote-by-key :oops)
-                     (get-rate-limit :oops)))
-(def bam-responder (make-throttled-responder
-                    (partial random-emote-by-key :bam)
-                    0))
-(def random-emoji-responder (make-probabalistic-responder
-                             random-emoji
-                             (get-probability :random-emoji)))
 
 ;; ### Quotes
 ;; Add a quote, search a quote by term, search a quote and return a specific result
@@ -383,17 +378,6 @@
 (defmethod dispatch-action :send-define-help
   [{:keys [msg]}]
   (send-define-help msg))
-
-;; Responders
-(defmethod dispatch-action :bam-responder
-  [{:keys [msg emotes]}]
-  (bam-responder msg emotes))
-(defmethod dispatch-action :oops-responder
-  [{:keys [msg emotes]}]
-  (oops-responder msg emotes))
-(defmethod dispatch-action :omg-responder
-  [{:keys [msg emotes]}]
-  (omg-responder msg emotes))
 
 ;; Help
 (defmethod dispatch-action :start-help
