@@ -2,7 +2,7 @@
 ;;
 ;; This file documents how to specify commands for Blabs, as well as providing
 ;; Blab' default configuration. Copy this file to `resources/commands.edn' as
-;; part of setting up Blabs; from there, you're all set to go.
+;; part of setting up Blabs; you'll get some nice basics and some baked-in gifs.
 ;;
 ;; Each configuration is a key-value pair, where key is the kebab-case :keyword
 ;; name of a command, and value is a map specifying the behavior of that
@@ -17,27 +17,46 @@
 ;; Each spec map can optionally specify three additional keys:
 ;;
 ;; - :user -- set the action to only respond to a user names which match a
-;;    specific regex. Defaults to "(?s).+" (match all user names)
+;;   specific regex. Defaults to "(?s).+" (match all user names)
 ;; - :action-args -- some actions take additional configuration, provided in
-;;   this key.
+;;   this key. For instance, the :random-emote-by-key action looks here for
+;;   its list of emotes.
 ;; - :help -- a help string, for use in Blabs' interactive help system. If
 ;;   the :help key is omitted, Blabs won't offer help for that command.
+;; - :probability -- The odds odds of an action occurring. 0 is never; 100 is
+;;   always, and the default.
+;; - :rate-limit -- How many seconds should we wait between times this action
+;;   can occur? Defaults to 0.
 ;;
-;; This file is loaded when blabs is built and run; blabs must be fully
+;; Right now, Blabs supports these user-configurable actions:
+;;
+;; - :random-emote-by-key
+;; - :add-quote
+;; - :find-quote-for-name
+;; - :find-random-quote
+;; - :add-definition
+;; - :find-definition
+;;
+;; *Note*: this file is loaded when blabs is built and run; blabs must be fully
 ;; restarted to pick up changes.
 ;;
 ;; For information on available actions and their configuration, see the Message
 ;; Actions documentation.
-{:tableflip
+;;
+{:random-emoji-responder
+ {:probability 10
+  :rate-limit 120}
+ :tableflip
  {:regex "!tableflip\\s*",
   :action :random-emote-by-key,
-  :action-args :tableflip,
+  :action-args ["(ﾉಥ益ಥ）ﾉ﻿ ┻━┻" "┻━┻ ︵ヽ(`Д´)ﾉ︵﻿ ┻━┻" "（╯°□°）╯︵ ┻━┻"],
   :help
   "!tableflip at the beginning of any line prints a random tableflip ascii!"},
  :wat
  {:regex "!wat\\s*",
   :action :random-emote-by-key,
-  :action-args :wat,
+  :action-args ["http://wil.to/_/wat.gif"
+                "http://bukk.it/iwata.gif"],
   :help "!wat at the beginning of any line prints a random WAT gif."},
  :add-quote
  {:regex "(?s)!q[uote]* add [\\w\\s\\.-]+: .+",
