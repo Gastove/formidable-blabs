@@ -348,9 +348,13 @@
   :action)
 
 (defmethod dispatch-action :random-emote-by-key
-  [{:keys [msg emotes action-args] :or {:action-args ""}}]
+  [{:keys [msg emotes action action-args throttle probability]
+    :or {action-args ""
+         throttle 0
+         probability 100}}]
   (log/debug "Dispatching a random emote!")
-  (random-emote-by-key action-args msg emotes))
+  (log/debug throttle)
+  (respond-with-random-thing msg action throttle probability action-args))
 
 (defmethod dispatch-action :send-message
   [{:keys [msg emotes action-args] :or {:action-args ""}}]
@@ -386,12 +390,16 @@
 
 ;; The actual default
 (defmethod dispatch-action :help-or-random-emoji-responder
-  [{:keys [msg emotes] :as args}]
+  [{:keys [msg emotes action action-args rate-limit probability]
+    :or {action-args ""
+         rate-limit 0
+         probability 100}
+    :as args}]
   (let [{:keys [user channel]} msg
         emoji (load-all-emoji)]
     (if (help/should-respond-with-help? user channel)
       (help/dispatch-help args)
-      (random-emoji-responder msg emoji))))
+      (respond-with-emoji msg emoji rate-limit probability))))
 
 ;; A fall-through, just in case, last ditch WTF default.
 (defmethod dispatch-action :default
@@ -426,17 +434,20 @@
 
 (defn build-match-clauses [match-specs]
   (reduce concat (for [[cmd spec] match-specs
+                       :when (not (some #{cmd} [:nomad/environment :nomad/hostname :nomad/instance :random-emoji]))
                        :let [clause (build-match-clause cmd spec)]]
                    clause)))
 
 (defmacro make-matcher []
   (let [raw-clauses (config/commands)
-        clauses# (build-match-clauses raw-clauses)]
+        emoji-args (:random-emoji raw-clauses)
+        clauses# (build-match-clauses raw-clauses)
+        else-clause# (merge {:action :help-or-random-emoji-responder} emoji-args)]
     `(fn [username# text#]
        (match [username# text#]
               ~@clauses#
               [_# #"!help"] {:action :start-help}
-              :else {:action :help-or-random-emoji-responder}))))
+              :else ~else-clause#))))
 
 (def matcher (make-matcher))
 
@@ -444,10 +455,8 @@
 (defn message-dispatch
   "Uses regex matching to take a specified action on text."
   [{:keys [user text] :as message :or {text "" user ""}}]
-  (let [emotes (load-emotes)
-        opt-ins (:opt-ins emotes)
-        emoji (load-all-emoji)
+  (let [emoji (load-all-emoji)
         username (slack/get-user-name user)]
     (if-let [match-result (matcher username text)]
-      (dispatch-action (assoc match-result :msg message :emotes emotes))
+      (dispatch-action (assoc match-result :msg message))
       (log/debug "No match made for text:" text))))
