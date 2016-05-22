@@ -4,5 +4,5 @@ jdk:
   - oraclejdk7
   - oraclejdk8
 
-  before_script:
-    - cp resources/commands.template.edn resources/commands.edn
+before_script:
+  - cp resources/commands.template.edn resources/commands.edn
