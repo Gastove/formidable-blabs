@@ -59,8 +59,9 @@
       (throw (java.io.IOException. "take! from websocket failed")))))
 
 (defn process-outbound
-  "Sends outgoing messages. Sends a ping every `config` seconds in which there
-  hasn't been any other traffic."
+  "Sends outgoing messages over a websocket connection. Sends a ping
+  every `config` seconds in which there hasn't been any other
+  traffic."
   [out-ch socket]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
         ping {:type "ping"}
@@ -83,11 +84,11 @@
       five-minutes)))
 
 (defn -main
-  "Runs the whole works. Runs two asynchronous processes: one to consume from
-  Slack and dispatch events; one to consume from an internal channel and send
-  events to Slack. The only feedback these procs will return is to throw an
-  error, which the main thread will catch, log, and then re-connect after
-  sleeping `backoff` seconds."
+  "Runs the whole works. Runs two asynchronous processes: one to
+  consume from Slack and dispatch events; one to consume from an
+  internal channel and send events to Slack. The only feedback these
+  procs will return is to throw an error, which the main thread will
+  catch, log, and then re-connect after sleeping `backoff` seconds."
   [& args]
   (loop [backoff 1000]
     (try

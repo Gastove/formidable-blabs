@@ -1,4 +1,4 @@
-(ns formidable-blabs.message-actions-tests
+(ns formidable-blabs.message-actions-test
   (:require [formidable-blabs.message-actions :as ma]
             [clojure.test :as t :refer [deftest testing is]]))
 
@@ -65,19 +65,21 @@
       result)))
 
 (def quote-strings ["Elvis: oh yeah (1/2)"
-                    "Bruce: Claptu verata nekto (2/2)"])
+                    "Bruce: Klaatu verata nekto (2/2)"])
 
-(deftest find-quote-for-user-or-term-test
+(deftest find-quote-for-name-test
   (testing "Can we get a quote for a user?"
    (let [incoming {:text "!quote Elvis" :quote "poot"}
          lookup-fn (lookup-quote-util "Elvis")
-         res (ma/find-quote-for-user-or-term incoming send-fn lookup-fn)]
+         regex (ma/load-regex-by-key :find-quote-for-name)
+         res (ma/find-quote-for-name incoming send-fn lookup-fn regex)]
      ;; Make sure there is a returned quote, and it's in the list.
      (= (not (nil? (some #{(second res)} quote-strings))))))
   (testing "Can we get a quote for a user by number?"
     (let [incoming {:text "!quote Elvis 2" :quote "poot"}
           lookup-fn (lookup-quote-util "Elvis")
           expected '("poot" (second quote-strings))
-          res (ma/find-quote-for-user-or-term incoming send-fn lookup-fn)]
+          regex (ma/load-regex-by-key :find-quote-for-name)
+          res (ma/find-quote-for-name incoming send-fn lookup-fn regex)]
       ;; Make sure there is a returned quote, and it's in the list.
       (= res expected))))

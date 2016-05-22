@@ -1,0 +1,86 @@
+;; Commands Configuration Template
+;;
+;; This file documents how to specify commands for Blabs, as well as providing
+;; Blab' default configuration. Copy this file to `resources/commands.edn' as
+;; part of setting up Blabs; you'll get some nice basics and some baked-in gifs.
+;;
+;; Each configuration is a key-value pair, where key is the kebab-case :keyword
+;; name of a command, and value is a map specifying the behavior of that
+;; command (hereafter, the spec map).
+;;
+;; The spec map requires two keys:
+;; - :regex -- the text in Slack that Blabs should respond to. Note that this
+;;   will be compiled in to a regex, and so any valid Clojure regex string can
+;;   be used, but will require escaped \-es (e.g. "\\s").
+;; - :action -- the action key Blabs will use internally to dispatch a response
+;;
+;; Each spec map can optionally specify three additional keys:
+;;
+;; - :user -- set the action to only respond to a user names which match a
+;;   specific regex. Defaults to "(?s).+" (match all user names)
+;; - :action-args -- some actions take additional configuration, provided in
+;;   this key. For instance, the :random-emote-by-key action looks here for
+;;   its list of emotes.
+;; - :help -- a help string, for use in Blabs' interactive help system. If
+;;   the :help key is omitted, Blabs won't offer help for that command.
+;; - :probability -- The odds odds of an action occurring. 0 is never; 100 is
+;;   always, and the default.
+;; - :rate-limit -- How many seconds should we wait between times this action
+;;   can occur? Defaults to 0.
+;;
+;; Right now, Blabs supports these user-configurable actions:
+;;
+;; - :random-emote-by-key
+;; - :add-quote
+;; - :find-quote-for-name
+;; - :find-random-quote
+;; - :add-definition
+;; - :find-definition
+;;
+;; *Note*: this file is loaded when blabs is built and run; blabs must be fully
+;; restarted to pick up changes.
+;;
+;; For information on available actions and their configuration, see the Message
+;; Actions documentation.
+;;
+{:random-emoji-responder
+ {:probability 10
+  :rate-limit 120}
+ :tableflip
+ {:regex "!tableflip\\s*",
+  :action :random-emote-by-key,
+  :action-args ["(ﾉಥ益ಥ）ﾉ﻿ ┻━┻" "┻━┻ ︵ヽ(`Д´)ﾉ︵﻿ ┻━┻" "（╯°□°）╯︵ ┻━┻"],
+  :help
+  "!tableflip at the beginning of any line prints a random tableflip ascii!"},
+ :wat
+ {:regex "!wat\\s*",
+  :action :random-emote-by-key,
+  :action-args ["http://wil.to/_/wat.gif"
+                "http://bukk.it/iwata.gif"],
+  :help "!wat at the beginning of any line prints a random WAT gif."},
+ :add-quote
+ {:regex "(?s)!q[uote]* add [\\w\\s\\.-]+: .+",
+  :action :add-quote,
+  :help
+  "Syntax: !q[uote] add name: quote\nAdds a quote to the quote database under a given name.\nExample: !q add Frank Zappa: I'm the slime"},
+ :find-quote-for-name
+ {:regex "!q[uote]* ([A-Za-z\\s\\.-]+)\\s?\\d*",
+  :action :find-quote-for-name,
+  :help
+  "Syntax: !q[uote] name\nFinds a quote for the provided name; search is case-insensitive. If more than one quote exists for an entity, a number can be provided to select one specifically.\nExample: !q frank zappa [or] !q Frank Zappa 5"},
+ :find-random-quote
+ {:regex "!q[uote]*",
+  :action :find-random-quote,
+  :help
+  "!q[uote], alone, followed by no other text, finds a random quote from all available quotes."},
+ :add-definition
+ {:regex "(?s)!define (\\w+): (.+)",
+  :action :add-definition,
+  :help
+  "Syntax: !define term: definition\nAssociates a definition with a term.\nExample: !define penguin: a little bird in a tuxedo"},
+ :find-definition
+ {:regex "(?s)!whatis (.+)\\s\\d+|!whatis (.+)",
+  :action :find-definition,
+  :help
+  "Syntax: !whatis term\nLooks up a term in the term database.\n Example: !whatis penguin"},
+ :send-define-help {:regex "(?s)!define.+", :action :send-define-help}}
