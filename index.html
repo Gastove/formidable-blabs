@@ -2866,7 +2866,7 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>formidable-blabs -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name"><a href="http://github.com/Gastove/formidable-blabs">formidable-blabs</a></h1><h2 class="project-version">0.1.0-SNAPSHOT</h2><br /><p>Help I accidentally a Slack bot</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.7.0</td></tr><tr><td class="dep-name">jarohen/nomad</td><td class="dotted"><hr /></td><td class="dep-version">0.7.2</td></tr><tr><td class="dep-name">aleph</td><td class="dotted"><hr /></td><td class="dep-version">0.4.0</td></tr><tr><td class="dep-name">manifold</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">com.taoensso/timbre</td><td class="dotted"><hr /></td><td class="dep-version">4.1.4</td></tr><tr><td class="dep-name">org.clojure/core.match</td><td class="dotted"><hr /></td><td class="dep-version">0.3.0-alpha4</td></tr><tr><td class="dep-name">org.clojure/core.async</td><td class="dotted"><hr /></td><td class="dep-version">0.1.346.0-17112a-alpha</td></tr><tr><td class="dep-name">cheshire</td><td class="dotted"><hr /></td><td class="dep-version">5.5.0</td></tr><tr><td class="dep-name">http-kit</td><td class="dotted"><hr /></td><td class="dep-version">2.1.19</td></tr><tr><td class="dep-name">clj-time</td><td class="dotted"><hr /></td><td class="dep-version">0.11.0</td></tr><tr><td class="dep-name">org.clojure/java.jdbc</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">korma</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">org.xerial/sqlite-jdbc</td><td class="dotted"><hr /></td><td class="dep-version">3.7.2</td></tr><tr><td class="dep-name">camel-snake-kebab</td><td class="dotted"><hr /></td><td class="dep-version">0.3.2</td></tr><tr><td class="dep-name">org.clojure/core.incubator</td><td class="dotted"><hr /></td><td class="dep-version">0.1.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#formidable-blabs.channels">formidable-blabs.channels</a></li><li><a href="#formidable-blabs.config">formidable-blabs.config</a></li><li><a href="#formidable-blabs.core">formidable-blabs.core</a></li><li><a href="#formidable-blabs.db">formidable-blabs.db</a></li><li><a href="#formidable-blabs.message-actions">formidable-blabs.message-actions</a></li><li><a href="#formidable-blabs.slack">formidable-blabs.slack</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.channels" name="formidable-blabs.channels"><h1 class="project-name">formidable-blabs.channels</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Utility NS; holds the channel other namespaces will put their outgoing
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.7.0</td></tr><tr><td class="dep-name">jarohen/nomad</td><td class="dotted"><hr /></td><td class="dep-version">0.7.2</td></tr><tr><td class="dep-name">aleph</td><td class="dotted"><hr /></td><td class="dep-version">0.4.0</td></tr><tr><td class="dep-name">manifold</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">com.taoensso/timbre</td><td class="dotted"><hr /></td><td class="dep-version">4.1.4</td></tr><tr><td class="dep-name">org.clojure/core.match</td><td class="dotted"><hr /></td><td class="dep-version">0.3.0-alpha4</td></tr><tr><td class="dep-name">org.clojure/core.async</td><td class="dotted"><hr /></td><td class="dep-version">0.1.346.0-17112a-alpha</td></tr><tr><td class="dep-name">cheshire</td><td class="dotted"><hr /></td><td class="dep-version">5.5.0</td></tr><tr><td class="dep-name">http-kit</td><td class="dotted"><hr /></td><td class="dep-version">2.1.19</td></tr><tr><td class="dep-name">clj-time</td><td class="dotted"><hr /></td><td class="dep-version">0.11.0</td></tr><tr><td class="dep-name">org.clojure/java.jdbc</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">korma</td><td class="dotted"><hr /></td><td class="dep-version">0.4.2</td></tr><tr><td class="dep-name">org.xerial/sqlite-jdbc</td><td class="dotted"><hr /></td><td class="dep-version">3.7.2</td></tr><tr><td class="dep-name">camel-snake-kebab</td><td class="dotted"><hr /></td><td class="dep-version">0.3.2</td></tr><tr><td class="dep-name">org.clojure/core.incubator</td><td class="dotted"><hr /></td><td class="dep-version">0.1.3</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#formidable-blabs.channels">formidable-blabs.channels</a></li><li><a href="#formidable-blabs.config">formidable-blabs.config</a></li><li><a href="#formidable-blabs.core">formidable-blabs.core</a></li><li><a href="#formidable-blabs.db">formidable-blabs.db</a></li><li><a href="#formidable-blabs.message-actions.help">formidable-blabs.message-actions.help</a></li><li><a href="#formidable-blabs.message-actions">formidable-blabs.message-actions</a></li><li><a href="#formidable-blabs.slack">formidable-blabs.slack</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.channels" name="formidable-blabs.channels"><h1 class="project-name">formidable-blabs.channels</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Utility NS; holds the channel other namespaces will put their outgoing
   actions on. Isolated to it's own NS to avoid circular dependencies and ease
   importing.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.channels
@@ -2877,7 +2877,8 @@ net.brehaut.ClojureTools = (function (SH) {
             [taoensso.timbre :refer [set-config! set-level!]]
             [taoensso.timbre.appenders.core :as appenders]
             [nomad :as nomad]))</pre></td></tr><tr><td class="docs"><p>Load configs.</p>
-</td><td class="codes"><pre class="brush: clojure">(nomad/defconfig blabs-config (io/resource &quot;config.edn&quot;))</pre></td></tr><tr><td class="docs"><p>Logging configs</p>
+</td><td class="codes"><pre class="brush: clojure">(nomad/defconfig blabs-config (io/resource &quot;config.edn&quot;))
+(nomad/defconfig commands (io/resource &quot;commands.edn&quot;))</pre></td></tr><tr><td class="docs"><p>Logging configs</p>
 </td><td class="codes"><pre class="brush: clojure">(set-config!
  ;; Set log global log level from config file based on env.4
  {:level (get-in (blabs-config) [:logging :level])
@@ -2935,8 +2936,9 @@ more about the RTM API itself.</p>
     (if-let [raw-body @(m/take! socket)]
       (do (parse-and-dispatch raw-body)
           (recur))
-      (throw (java.io.IOException. &quot;take! from websocket failed&quot;)))))</pre></td></tr><tr><td class="docs"><p>Sends outgoing messages. Sends a ping every <code>config</code> seconds in which there
-  hasn't been any other traffic.</p>
+      (throw (java.io.IOException. &quot;take! from websocket failed&quot;)))))</pre></td></tr><tr><td class="docs"><p>Sends outgoing messages over a websocket connection. Sends a ping
+  every <code>config</code> seconds in which there hasn't been any other
+  traffic.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn process-outbound
   [out-ch socket]
   (let [ping-millis (* (:ping (blabs-config)) 1000)
@@ -2955,11 +2957,11 @@ more about the RTM API itself.</p>
   (let [five-minutes (* 60 1000 5)]
     (if (&lt; last-backoff five-minutes)
       (* 2 last-backoff)
-      five-minutes)))</pre></td></tr><tr><td class="docs"><p>Runs the whole works. Runs two asynchronous processes: one to consume from
-  Slack and dispatch events; one to consume from an internal channel and send
-  events to Slack. The only feedback these procs will return is to throw an
-  error, which the main thread will catch, log, and then re-connect after
-  sleeping <code>backoff</code> seconds.</p>
+      five-minutes)))</pre></td></tr><tr><td class="docs"><p>Runs the whole works. Runs two asynchronous processes: one to
+  consume from Slack and dispatch events; one to consume from an
+  internal channel and send events to Slack. The only feedback these
+  procs will return is to throw an error, which the main thread will
+  catch, log, and then re-connect after sleeping <code>backoff</code> seconds.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn -main
   [&amp; args]
   (loop [backoff 1000]
@@ -3052,7 +3054,127 @@ and <code>definitions</code>.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn find-quote-by-string-and-user
   [u s]
   (select quotes (where {:user [like u]
-                         :quote [like (str &quot;%&quot; s &quot;%&quot;)]})))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.message-actions" name="formidable-blabs.message-actions"><h1 class="project-name">formidable-blabs.message-actions</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+                         :quote [like (str &quot;%&quot; s &quot;%&quot;)]})))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.message-actions.help" name="formidable-blabs.message-actions.help"><h1 class="project-name">formidable-blabs.message-actions.help</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.message-actions.help
+  (:require [clojure
+             [edn :as edn]
+             [string :as str]]
+            [clojure.core.strint :refer [&lt;&lt;]]
+            [clojure.java.io :as io]
+            [formidable-blabs.slack :as slack]
+            [formidable-blabs.config :as config]
+            [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs"><h3>The `help' ns</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>This is Blabs' help system. It's interactive, and based on DMs (so it wont
+clog up the main chat channels Blabs is in; also for simplicity of
+implementation). Blabs loads its help from its main commands configuration
+file, commands.end, and wont offer help on any command without a `:help' key
+in its config map.</p>
+
+<p>In the future, it will be possible to (re-)define the help text for a command
+interactively, but at present that feature has yet to be implemented.</p>
+
+<h4>Planned Improvements</h4>
+
+<p>TODO: Allow (re-)defining help, interactively; maybe don't let just <em>any</em>
+user do this? Can check a users' admin flag, but using nomad for the config
+file makes this... interesting.
+TODO: Fuzzy-match help > strict text match help</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def commands-map (config/commands))</pre></td></tr><tr><td class="docs"><p>Takes a map of commands of the format {command-name {command-spec}}
+  Returns the names of every command with a :help key defined.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn make-topic-list
+  [commands]
+  (-&gt;&gt; commands
+       (filter (fn [[_ spec]] (not (nil? (:help spec)))))
+       (keys)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn make-indexed-topics
+  [topics]
+  (into {} (map-indexed (fn [idx k] [idx k]) topics)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def commands-by-index (-&gt; commands-map
+                           (make-topic-list)
+                           (make-indexed-topics)
+                           (sort)))</pre></td></tr><tr><td class="docs"><p>Takes a string with a name like `find quote for name'
+  Returns a kebab-case keyword like `:find-quote-for-name'</p>
+
+<p>Formatting</p>
+</td><td class="codes"><pre class="brush: clojure">(defn format-text-as-command-name
+  [t]
+  (-&gt; t
+      (str/replace #&quot;\s&quot; &quot;-&quot;)
+      (keyword)))</pre></td></tr><tr><td class="docs"><p>Takes a keyword like :find-quote-for-name
+  Returns text like `find quote for name'</p>
+</td><td class="codes"><pre class="brush: clojure">(defn format-command-key-as-text
+  [cmd-key]
+  (-&gt; cmd-key
+      (name)
+      (str/replace #&quot;\-&quot; &quot; &quot;)))</pre></td></tr><tr><td class="docs"><p>Takes the list of key names returned by `make-topic-list'.
+  Returns a string of topics formatted as `[Index of topic name] topic name'</p>
+</td><td class="codes"><pre class="brush: clojure">(defn format-topic-list
+  [topic-list]
+  (let [pieces (for [[idx cmd] topic-list
+                     :let [cmd-name (format-command-key-as-text cmd)]]
+                 (&lt;&lt; &quot;[~{idx}] ~{cmd-name}&quot;))]
+    (str/join \newline pieces)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def help-channels (atom {}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn get-help-channel-for-user
+  [user-id]
+  (@help-channels user-id))</pre></td></tr><tr><td class="docs"><p>Creates the initial message a user will receive on their DM channel with
+  Blabs when they initiate a help session.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn make-opening-message
+  [indexed-command-names]
+  (let [topics (format-topic-list indexed-command-names)
+        opening &quot;Hi! What can I help you with? Here's the commands I've got:&quot;
+        closing (str &quot;Which command would you like to know more about?&quot;
+                     &quot;You can say a number or an exact term, or say \&quot;done\&quot;&quot;
+                     &quot;to end help.&quot;)]
+    (str/join \newline [opening topics closing])))</pre></td></tr><tr><td class="docs"><p>Initiates a help session. Opens a direct message channel, then
+  adds the pair `user-id dm-channel' to the help-channels atom.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn start-help
+  [{user-id :user}]
+  (let [dm-channel-resp (slack/open-direct-message-channel user-id)
+        dm-channel (get-in dm-channel-resp [:channel :id])
+        opening-message (make-opening-message commands-by-index)]
+    (slack/post-message dm-channel opening-message)
+    (swap! help-channels assoc user-id dm-channel)))</pre></td></tr><tr><td class="docs"><p>Do we currently have a `user-id dm-channel' pair in the
+  help-channels atom for a given user-id?</p>
+</td><td class="codes"><pre class="brush: clojure">(defn user-help-session-active?
+  [user-id]
+  (contains? @help-channels user-id))</pre></td></tr><tr><td class="docs"><p>We should respond with help if a user-id has an active help session
+  <em>and</em> the channel we've received a message from that user on is
+  that users'  DM channel.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn should-respond-with-help?
+  [user-id channel]
+  (and (user-help-session-active? user-id)
+       (= (@help-channels user-id) channel)))</pre></td></tr><tr><td class="docs"><p>Returns either the help text for a command, or a polite apology.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn load-help-by-key
+  [k]
+  (if-let [help-text (get-in commands-map [k :help])]
+    help-text
+    (&lt;&lt; &quot;I'm sorry, I don't know how to help you with \&quot;~{k}\&quot;. Try again?'&quot;)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn get-help-by-number [n]
+  (let [idx (read-string n)
+        k (commands-by-index idx)]
+    (load-help-by-key k)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn get-help-by-string [s]
+  (let [k (format-text-as-command-name s)]
+    (load-help-by-key k)))</pre></td></tr><tr><td class="docs"><p>End the help session for a user by removing that users ID and dm-channel from
+  the help-channels atom</p>
+</td><td class="codes"><pre class="brush: clojure">(defn end-help
+  [user-id]
+  (let [help-channel (get-help-channel-for-user user-id)]
+    (slack/send-msg-on-channel! help-channel &quot;Okie dokie!&quot;)
+    (swap! help-channel dissoc user-id)))</pre></td></tr><tr><td class="docs"><p>Entry point for a current help session. Checks whether a user has provided a
+  numeric response or a text response and tries to provide help accordingly.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn dispatch-help
+  [{message :msg}]
+  (let [{:keys [user text]} message
+        help-channel (get-help-channel-for-user user)]
+    (if (= text &quot;done&quot;)
+      (end-help help-channel)
+      (let [help-text (if (number? (read-string text))
+                        (get-help-by-number text)
+                        (get-help-by-string text))]
+        (slack/send-msg-on-channel! help-channel help-text)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.message-actions" name="formidable-blabs.message-actions"><h1 class="project-name">formidable-blabs.message-actions</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.message-actions
   (:require [clj-time.core :as time]
             [clojure
@@ -3066,9 +3188,35 @@ and <code>definitions</code>.</p>
             [clojure.java.io :as io]
             [formidable-blabs
              [channels :refer [outbound-channel]]
+             [config :as config]
              [db :as db]
-             [slack :as slack]]
-            [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs"><h3>Message Actions</h3>
+             [slack :as slack :refer [send-msg-on-channel!]]]
+            [formidable-blabs.message-actions.help :as help]
+            [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs"><h3>Message Action Utilities</h3>
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Given a key k, load a command's regex from the commands config</p>
+</td><td class="codes"><pre class="brush: clojure">(defn load-regex-by-key
+  [k]
+  (let [re-str (get-in (config/commands) [k :regex])]
+    (try
+      (if-not (nil? re-str)
+        (re-pattern re-str)
+        (log/debug &quot;No regex found for key:&quot; k))
+      (catch RuntimeException rte
+        (log/error
+         (&lt;&lt; &quot;Invalid regex pattern ~{re-str} found for key ~{k}&quot;)
+         rte)))))</pre></td></tr><tr><td class="docs"><p>Returns an int with the following behavior:
+  - If the lower and upper bounds are identical, return the lower bound
+  - Otherwise, return an int from the range [lower upper)</p>
+</td><td class="codes"><pre class="brush: clojure">(defn bounded-rand-int
+  [lower upper]
+  (cond
+    (= lower upper) lower
+    (&lt; (- upper lower) 100) (rand-nth (range lower upper))
+    :else (loop [n (rand-int upper)]
+            (if (&lt; n lower)
+              (recur (rand-int upper))
+              n))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn third [coll] (nth coll 2))</pre></td></tr><tr><td class="docs"><h3>Message Actions</h3>
 
 <p>Actions based on either the sender of a message, the channel of a message,
 text in a message, or all three. Divides broadly into commands, emotes, and
@@ -3109,17 +3257,7 @@ rate-limited, probabalistic, or both.</p>
 <li>[wh]oops</li>
 <li>Random emotes</li>
 </ul>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Put a message on the global outbound channel for processing.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn send-msg-on-channel!
-  [slack-channel text]
-  (go (&gt;! outbound-channel {:type &quot;message&quot; :channel slack-channel :text text})))</pre></td></tr><tr><td class="docs"><p>Loads a set of responses by key out of resources/emotes.edn; returns a random
-  emote</p>
-</td><td class="codes"><pre class="brush: clojure">(defn random-emote-by-key
-  [k message emotes]
-  (let [flips (k emotes)
-        flip (rand-nth flips)
-        to-chan (:channel message)]
-    (send-msg-on-channel! to-chan flip)))</pre></td></tr><tr><td class="docs"><p>Loads known emoji from file, adds in team custom emoji from the Slack
+</td><td class="codes"></td></tr><tr><td class="docs"><p>Loads known emoji from file, adds in team custom emoji from the Slack
   API. Selects one at random, adds it as a response to a message. If the emoji
   name isn't recognized, purges it from the known emoji list.</p>
 </td><td class="codes"><pre class="brush: clojure">(declare remove-emoji-and-write! load-emoji-on-file)
@@ -3164,87 +3302,80 @@ rate-limited, probabalistic, or both.</p>
   (let [new-emojis (vec (remove #{emoji} emojis))]
     (spit (io/resource &quot;emoji_names.edn&quot;)
           (with-out-str (pr {:names new-emojis})))
-    new-emojis))</pre></td></tr><tr><td class="docs"><h3>Random Actions</h3>
-
-<p>Given a percent chance in 100 an action should occur, conditionally do the
-action or pass</p>
-</td><td class="codes"><pre class="brush: clojure">(defn make-probabalistic-responder
-  [action probability]
-  (fn [&amp; args]
-    (let [n (rand-int 99)]
-      (if (&lt; n probability)
-        (apply action args)
-        (log/debug &quot;Rolled an&quot; (str &quot;'&quot; n &quot;'&quot;) &quot; probability is:&quot; probability &quot;, passing&quot;)))))</pre></td></tr><tr><td class="docs"><p>Not every response should happen every time.</p>
-
-<h3>Rate Limits</h3>
-
-<p>Some things shouldn't run all the time. This wrapper makes a function get
-called no more than every throttle-seconds seconds.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn make-throttled-responder
-  [action throttle-seconds]
-  (let [last-replied (atom (time/date-time 0))]
-    (fn [&amp; action-args]
-      (let [since-last-millis (* throttle-seconds 1000)]
-        (if (time/after? (time/now) (time/plus @last-replied (time/millis since-last-millis)))
-          (do (apply action action-args)
-              (swap! last-replied (fn [x] (time/now))))
-          (log/info &quot;Not performing action yet, too soon&quot;))))))</pre></td></tr><tr><td class="docs"><h3>Check to see if it's time to do an action; if so, check its probability.</h3>
-</td><td class="codes"><pre class="brush: clojure">(defn make-probabalistic-throttled-responder
-  [action probability throttle-seconds]
-  (make-probabalistic-responder
-   (make-throttled-responder action probability) throttle-seconds))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn load-emotes []
-  (edn/read-string (slurp (io/resource &quot;emotes.edn&quot;) :encoding &quot;utf-16&quot;)))</pre></td></tr><tr><td class="docs">
+    new-emojis))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn argenfloop
+  [{:keys [action action-args probability rate-limit] :or {:probability 100
+                                                           :rate-limit 0}}]
+  (let [last-replied (atom (time/date-time 0))
+        since-last-millis (* rate-limit 1000)
+        n (rand-int 99)
+        time? (time/after? (time/now)
+                           (time/plus @last-replied
+                                      (time/millis since-last-millis)))
+        chance? (&lt; n probability)]
+    (cond
+      time? (do (apply action action-args)
+                (swap! last-replied (fn [x] (time/now))))
+      chance? (apply action action-args)
+      :else (log/debug &quot;No action just yet.&quot;))))</pre></td></tr><tr><td class="docs"><p>new throttling</p>
+</td><td class="codes"><pre class="brush: clojure">(def last-replied-map (atom {}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn time-to-reply?
+  [last-replied throttle-millis]
+  (time/after? (time/now) (time/plus last-replied (time/millis throttle-millis))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn pick-and-send-random
+  [message possibilities]
+  (let [selected (rand-nth possibilities)
+        to-chan (:channel message)]
+    (send-msg-on-channel! to-chan selected)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn set-last-sent-and-send
+  [emote-key message possibilities]
+  (swap! last-replied-map assoc emote-key (time/now))
+  (pick-and-send-random message possibilities))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn set-last-done-and-do
+  [emote-key action action-args]
+  (swap! last-replied-map assoc emote-key (time/now))
+  (apply action action-args))</pre></td></tr><tr><td class="docs"><p>Takes a message, an action to perform on the message, arguments to that
+  action, a probability, and a rate limit; responds if: the action isn't rate
+  limited by time or the time limit is up; the actions probability checks out.
+  Note that time takes precedence over probability.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn respond
+  [message action action-name action-args rate-limit probability]
+  (let [last-replied-time (get @last-replied-map action-name (time/date-time 0))
+        throttle-millis (* 1000 rate-limit)]
+    (cond
+      (time-to-reply? last-replied-time throttle-millis) (set-last-done-and-do action-name action action-args)
+      (&lt; (rand-int 99) probability) (apply action action-args)
+      :else (log/debug (str &quot;It either isn't time or the probabilities&quot;
+                            &quot; didn't shake out, no action yet&quot;)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn respond-with-emoji
+  [message emoji rate-limit probability]
+  (respond message random-emoji :random-emoji [message emoji] rate-limit probability))</pre></td></tr><tr><td class="docs"><p>Given a set of things to respond with -- emoji or gifs, for instance --
+  respond if: the action isn't rate limited by time or the time limit is up;
+  the actions probability checks out. Note that time takes precedence over
+  probability.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn respond-with-random-thing
+  [message emote-key rate-limit probability things]
+  (respond message pick-and-send-random :emote-key [message things] rate-limit probability))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn load-emoji-on-file
   []
   (:names (edn/read-string (slurp (io/resource &quot;emoji_names.edn&quot;)))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn load-all-emoji []
   (let [emojis-on-file (load-emoji-on-file)
         custom-emoji (slack/get-custom-emoji)]
-    (into emojis-on-file custom-emoji)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn get-rate-limit [k]
-  (let [emotes (load-emotes)
-        rates (:rate-limits emotes)]
-    (get rates k 10)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn get-probability [k]
-  (let [emotes (load-emotes)
-        probabilities (:probabilities emotes)]
-    (get probabilities k 50)))</pre></td></tr><tr><td class="docs"><h3>Responders</h3>
-
-<p>Here's how we actually assemble the above into something that'll check
-timeouts and probabilities, then respond with an appropriate random reaction.</p>
-</td><td class="codes"><pre class="brush: clojure">(def omg-responder (make-throttled-responder
-                    (partial random-emote-by-key :omg)
-                    (get-rate-limit :omg)))
-(def oops-responder (make-throttled-responder
-                     (partial random-emote-by-key :oops)
-                     (get-rate-limit :oops)))
-(def bam-responder (make-throttled-responder
-                    (partial random-emote-by-key :bam)
-                    0))
-(def random-emoji-responder (make-probabalistic-responder
-                             random-emoji
-                             (get-probability :random-emoji)))</pre></td></tr><tr><td class="docs"><h3>Quotes</h3>
+    (into emojis-on-file custom-emoji)))</pre></td></tr><tr><td class="docs"><h3>Quotes</h3>
 
 <p>Add a quote, search a quote by term, search a quote and return a specific result</p>
 </td><td class="codes"><pre class="brush: clojure">(defn add-quote!
   [{:keys [text channel]}]
-  (if-let [[_ user quote-text] (re-find #&quot;(?s)!q[uote]* add (\w+) (.+)&quot; text)]
-    (do
-      (db/record-quote user quote-text)
-      (send-msg-on-channel! channel &quot;Quote added!&quot;))
-    (do
-      (send-msg-on-channel! channel &quot;Erk! Something didn't work. One thousand apologies.&quot;)
-      (log/error &quot;Either user or text not found?! That's effed up:&quot; text))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn bounded-rand-int
-  [lower upper]
-  (cond
-    (= lower upper) lower
-    (&lt; (- upper lower) 100) (rand-nth (range lower upper))
-    :else (loop [n (rand-int upper)]
-            (if (&lt; n lower)
-              (recur (rand-int upper))
-              n))))</pre></td></tr><tr><td class="docs"><p>Given a text to look in and a regex that captures a number from that text,
+  (let [regex (load-regex-by-key :add-quote)]
+    (if-let [[_ user quote-text] (re-find regex text)]
+      (do
+        ;; Regex currently might grab an extra space at the end of user; trim.
+        (db/record-quote (str/trim user) quote-text)
+        (send-msg-on-channel! channel &quot;Quote added!&quot;))
+      (do
+        (send-msg-on-channel! channel &quot;Erk! Something didn't work. One thousand apologies.&quot;)
+        (log/error &quot;Either user or text not found?! That's effed up:&quot; text)))))</pre></td></tr><tr><td class="docs"><p>Given a text to look in and a regex that captures a number from that text,
   parse that text and return the number as an Integer, or return a sensible
   default.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn extract-num-with-regex
@@ -3266,22 +3397,27 @@ timeouts and probabilities, then respond with an appropriate random reaction.</p
 </td><td class="codes"><pre class="brush: clojure">(defn extract-definition-number
   [text num-defs]
   (extract-num-with-regex text num-defs #&quot;(?s)!whatis .+ (\d+)&quot; identity))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn find-quote-for-user-or-term
+</td><td class="codes"><pre class="brush: clojure">(defn send-nth-quote!
+  [quotes text channel send-fn]
+  (let [num-quotes (count quotes)
+        n (extract-quote-num text num-quotes)
+        ;; Vectors are zero-indexed, so nth accordingly.
+        {user :user quote-text :quote} (nth quotes (- n 1))
+        msg (&lt;&lt; &quot;~{user}: ~{quote-text} (~{n}/~{num-quotes})&quot;)]
+    (send-fn channel msg)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn find-quote-for-name
   ([m]
-   (find-quote-for-user-or-term m
-                                send-msg-on-channel!
-                                db/find-quote-by-user-or-term))
-  ([{:keys [text channel]} send-fn lookup-fn]
-   (if-let [[_ user-or-term] (re-find #&quot;!q[uote]* (\w+)&quot; text)]
-     (let [result-seq (lookup-fn user-or-term)]
+   (find-quote-for-name m
+                        send-msg-on-channel!
+                        db/find-quote-by-user-or-term
+                        (load-regex-by-key :find-quote-for-name)))
+  ([{:keys [text channel]} send-fn lookup-fn regex]
+   (if-let [[_ untrimmed-name] (re-find regex text)]
+     (let [name-to-find (str/trim untrimmed-name)
+           result-seq (lookup-fn name-to-find)]
        (if-not (empty? result-seq)
-         (let [num-quotes (count result-seq)
-               n (extract-quote-num text num-quotes)
-               ;; Vectors are zero-indexed, so nth accordingly.
-               {user :user quote-text :quote} (nth result-seq (- n 1))
-               msg (&lt;&lt; &quot;~{user}: ~{quote-text} (~{n}/~{num-quotes})&quot;)]
-           (send-fn channel msg))
-         (log/debug (&lt;&lt; &quot;No quote found for ~{user-or-term}&quot;)))))))</pre></td></tr><tr><td class="docs">
+         (send-nth-quote! result-seq text channel send-fn)
+         (log/debug (&lt;&lt; &quot;No quote found for ~{name-to-find}&quot;)))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn find-random-quote
   ([m] (find-random-quote m send-msg-on-channel!))
   ([{:keys [channel]} send-fn]
@@ -3294,31 +3430,32 @@ timeouts and probabilities, then respond with an appropriate random reaction.</p
 </td><td class="codes"><pre class="brush: clojure">(defn add-definition!
   ([m] (add-definition! m send-msg-on-channel!))
   ([{:keys [text channel]} send-fn]
-   (if-let [[_ term definition] (re-find #&quot;(?s)!define (\w+): (.+)&quot; text)]
-     (do
-       (db/record-definition term definition)
-       (send-fn channel (&lt;&lt; &quot;Okay! `~{term}` is now defined as, `~{definition}`&quot;)))
-     (do
-       (send-fn &quot;Erk! Something went wrong. I couldn't define that.&quot;)
-       (log/error &quot;Couldn't get a definition out of:&quot; text)))))</pre></td></tr><tr><td class="docs">
+   (let [regex (load-regex-by-key :add-definition)]
+     (if-let [[_ term definition] (re-find regex text)]
+       (do
+         (db/record-definition term definition)
+         (send-fn channel (&lt;&lt; &quot;Okay! `~{term}` is now defined as, `~{definition}`&quot;)))
+       (do
+         (send-fn &quot;Erk! Something went wrong. I couldn't define that.&quot;)
+         (log/error &quot;Couldn't get a definition out of:&quot; text))))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn send-define-help
   [{:keys [text channel]}]
-  (let [msg (str &quot;I didn't get that. To define a term, use the command&quot;
-                 &quot; format, `!define term: definition`&quot;)]
-    (send-msg-on-channel! channel msg)))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defn third
-  [coll]
-  (nth coll 2))</pre></td></tr><tr><td class="docs"><h3>Definition Lookup</h3>
+  (let [msg (str/join &quot; &quot;
+                      [&quot;I didn't get that. To define a term, use the command&quot;
+                       &quot;format, `!define term: definition`&quot;])]
+    (send-msg-on-channel! channel msg)))</pre></td></tr><tr><td class="docs"><h3>Definition Lookup</h3>
 
 <p>You may be thinking, <code>find-defintion</code> looks an <em>awful lot</em> like
-<code>find-quote-for-user-or-term</code> -- and you're right. The important difference
+<code>find-quote-for-name</code> -- and you're right. The important difference
 is: you can define nearly anything, so the regex must match on <code>.+</code> to be
 sure of getting everything -- which means, <code>term</code> needs to be parsed out with
 <code>second</code>. Haven't figured out <em>quite</em> how to abstract this all together yet.</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn find-definition
   ([m] (find-definition m send-msg-on-channel! db/find-definiton-by-term))
   ([{:keys [text channel]} send-fn lookup-fn]
-   (let [m (re-find #&quot;(?s)!whatis (.+)\s\d+|!whatis (.+)&quot; text)
+   (let [regex (load-regex-by-key :find-definition)
+         m (re-find regex text)
          term (or (second m) (third m))
          result-seq (lookup-fn term)
          num-defs (count result-seq)
@@ -3326,51 +3463,136 @@ sure of getting everything -- which means, <code>term</code> needs to be parsed 
          d (nth result-seq (- n 1))
          {defd-on :defined-at definition :definition} d
          msg (&lt;&lt; &quot;~{term}:\n&gt; ~{definition}\n Definition ~{n} of ~{num-defs}; last defined ~{defd-on}&quot;)]
-     (send-fn channel msg))))</pre></td></tr><tr><td class="docs">
+     (send-fn channel msg))))</pre></td></tr><tr><td class="docs"><p>Not currently used. Does a handy thing, but unclear if it does a necessary
+thing.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn name-regex [names]
   (if (or (= names :all) (nil? names))
     #&quot;(?s).+&quot;
-    (re-pattern (str/join \| names))))</pre></td></tr><tr><td class="docs"><h3>Dispatcher</h3>
+    (re-pattern (str/join \| names))))</pre></td></tr><tr><td class="docs"><p> <code>dispatch-action' dispatches on the</code>:action' key of a `message-dispatch'
+  match map. While `message-dispatch' uses regex matching to see if there's an
+  action to take at all, `dispatch-action' answers the question, "what do we do
+  with a given action?"</p>
 
-<p>Matches on the combination of [username text], typically using simple string
-matching for username and a regexp for text. <code>_</code> in this context means "match
-everything".</p>
+<p>  Expects a map:
+  {
+  :action -- required --  the map key this function dispatches on
+  :msg -- required -- the original slack message map being responded to; required by
+    most actions to, at minimum, know what channel to post in to
+  :emotes -- optional -- for emoting actions, the list of possible emotes
+  :action-args -- optional -- additional arguments of all shapes and
+    kinds, passed to the action.
+  }</p>
+
+<h3>The Action Dispatcher</h3>
+</td><td class="codes"><pre class="brush: clojure">(defmulti dispatch-action
+  ;; Dispatch fn:
+  :action)</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :random-emote-by-key
+  [{:keys [msg emotes action action-args throttle probability]
+    :or {action-args &quot;&quot;
+         throttle 0
+         probability 100}}]
+  (log/debug &quot;Dispatching a random emote!&quot;)
+  (log/debug throttle)
+  (respond-with-random-thing msg action throttle probability action-args))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :send-message
+  [{:keys [msg emotes action-args] :or {:action-args &quot;&quot;}}]
+  (send-msg-on-channel! (:channel msg) action-args))</pre></td></tr><tr><td class="docs"><p>Quote actions</p>
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :add-quote
+  [{:keys [msg]}]
+  (add-quote! msg))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :find-quote-for-name
+  [{:keys [msg]}]
+  (find-quote-for-name msg))
+(defmethod dispatch-action :find-random-quote
+  [{:keys [msg]}]
+  (find-random-quote msg))</pre></td></tr><tr><td class="docs"><p>Definition actions</p>
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :add-definition
+  [{:keys [msg]}]
+  (add-definition! msg))
+(defmethod dispatch-action :find-definition
+  [{:keys [msg]}]
+  (find-definition msg))
+(defmethod dispatch-action :send-define-help
+  [{:keys [msg]}]
+  (send-define-help msg))</pre></td></tr><tr><td class="docs"><p>Help</p>
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :start-help
+  [{:keys [msg]}]
+  (help/start-help msg))</pre></td></tr><tr><td class="docs"><p>The actual default</p>
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :help-or-random-emoji-responder
+  [{:keys [msg emotes action action-args rate-limit probability]
+    :or {action-args &quot;&quot;
+         rate-limit 0
+         probability 100}
+    :as args}]
+  (let [{:keys [user channel]} msg
+        emoji (load-all-emoji)]
+    (if (help/should-respond-with-help? user channel)
+      (help/dispatch-help args)
+      (respond-with-emoji msg emoji rate-limit probability))))</pre></td></tr><tr><td class="docs"><p>A fall-through, just in case, last ditch WTF default.</p>
+</td><td class="codes"><pre class="brush: clojure">(defmethod dispatch-action :default
+  [args]
+  (log/info &quot;No dispatch clause found for:&quot; args))</pre></td></tr><tr><td class="docs"><h3>Matcher</h3>
+
+<p>Matches on the combination of [username text], using regex matching. Only two
+actions are baked in: the `random-emoji-responder' and the help system. All
+the rest are loaded at compile time from a configuration file. This means
+that 1) what blabs responds to is fully configurable, and 2) configuration
+changes require a restart of blabs.</p>
 
 <p><strong>Remember:</strong> Matching is done by <code>re-matches</code>, which only matches if the _entire
-string_ matches. Also remember that <code>match</code> clauses <strong>must</strong> be static
-compile-time literals, so you cannot use something defined in the <code>let</code> as a
-regex in the match clauses -- you have to load and <code>def</code> them as symbols in the NS.</p>
-</td><td class="codes"></td></tr><tr><td class="docs"><p>Uses regex matching to take a specified action on text.</p>
+string_ matches the given regex. Also remember that <code>match</code> clauses <strong>must</strong>
+be static compile-time literals, so you cannot use something defined in the
+<code>let</code> as a regex in the match clauses -- you have to load and <code>def</code> them
+as symbols in the namespace.</p>
+</td><td class="codes"></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn build-match-clause
+  [cmd {:keys [user regex] :as args-map :or {user &quot;(?s).+&quot;}}]
+  (try
+    (let [username-re (re-pattern user)
+          command-re (re-pattern regex)
+          pass-on-args (dissoc args-map :user :command)]
+      [[username-re command-re] pass-on-args])
+    (catch RuntimeException e
+      (do
+        (log/error
+         (&lt;&lt; &quot;Invalid regex pattern ~{regex} for command map ~{cmd}&quot;)
+         nil)))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn build-match-clauses [match-specs]
+  (reduce concat (for [[cmd spec] match-specs
+                       :when (not (some #{cmd} [:nomad/environment :nomad/hostname :nomad/instance :random-emoji]))
+                       :let [clause (build-match-clause cmd spec)]]
+                   clause)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmacro make-matcher []
+  (let [raw-clauses (config/commands)
+        emoji-args (:random-emoji raw-clauses)
+        clauses# (build-match-clauses raw-clauses)
+        else-clause# (merge {:action :help-or-random-emoji-responder} emoji-args)]
+    `(fn [username# text#]
+       (match [username# text#]
+              ~@clauses#
+              [_# #&quot;!help&quot;] {:action :start-help}
+              :else ~else-clause#))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def matcher (make-matcher))</pre></td></tr><tr><td class="docs"><p>Uses regex matching to take a specified action on text.</p>
+
+<p>TODO: turn match-result in to a defrecord; pull useful keys in to it.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn message-dispatch
   [{:keys [user text] :as message :or {text &quot;&quot; user &quot;&quot;}}]
-  (let [emotes (load-emotes)
-        opt-ins (:opt-ins emotes)
-        emoji (load-all-emoji)
+  (let [emoji (load-all-emoji)
         username (slack/get-user-name user)]
-    (match [username text]
-           [_ #&quot;!wat\s*&quot;] (random-emote-by-key :wat message emotes)
-           [_ #&quot;!unicorns\s*&quot;] (random-emote-by-key :unicorns message emotes)
-           [_ #&quot;!welp\s*&quot;] (random-emote-by-key :welp message emotes)
-           [_ #&quot;!nope\s*&quot;] (random-emote-by-key :nope message emotes)
-           [_ #&quot;!tableflip\s*&quot;] (random-emote-by-key :tableflip message emotes)
-           [_ #&quot;(?i)[z?omf?g ]+\s*&quot;] (omg-responder message emotes)
-           [_ #&quot;(?i)[wh]*oops|uh-oh&quot;] (oops-responder message emotes)
-           [_ #&quot;(?i)!?bam!?&quot;] (bam-responder message emotes)
-           [_ #&quot;(?s)!q[uote]* add \w+ .+&quot;] (add-quote! message)
-           [_ #&quot;!q[uote]* \w+\s?\d*&quot;] (find-quote-for-user-or-term message)
-           [_ #&quot;!q[uote]*&quot;] (find-random-quote message)
-           [_ #&quot;(?s)!define \w+: .+&quot;] (add-definition! message)
-           [_ #&quot;(?s)!define.+&quot;] (send-define-help message)
-           [_ #&quot;(?s)!whatis .+&quot;] (find-definition message)
-           [_ _] (random-emoji-responder message emoji)
-           :else (log/debug &quot;No message action found.&quot;))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.slack" name="formidable-blabs.slack"><h1 class="project-name">formidable-blabs.slack</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+    (if-let [match-result (matcher username text)]
+      (dispatch-action (assoc match-result :msg message))
+      (log/debug &quot;No match made for text:&quot; text))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#formidable-blabs.slack" name="formidable-blabs.slack"><h1 class="project-name">formidable-blabs.slack</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns formidable-blabs.slack
   (:require [aleph.http :as aleph]
             [cheshire.core :as json]
-            [clojure.core.async :as async]
-            [formidable-blabs.config :refer [blabs-config]]
+            [clojure.core.async :as async :refer [&gt;! go]]
+            [formidable-blabs
+             [channels :refer [outbound-channel]]
+             [config :refer [blabs-config]]]
             [org.httpkit.client :as http]
             [taoensso.timbre :as log]))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(def self (atom ))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn make-slack-request
   ([endpoint] (make-slack-request endpoint {}))
   ([endpoint params]
@@ -3385,29 +3607,44 @@ regex in the match clauses -- you have to load and <code>def</code> them as symb
    (let [resp (make-slack-request endpoint params)]
      (json/parse-string (:body resp) keyword))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn get-ws-url []
-  (make-slack-request-and-parse-body :rtm-start))</pre></td></tr><tr><td class="docs"><p>TODO: stop connecting here, just return socket</p>
+  (make-slack-request-and-parse-body :rtm-start))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn connect-to-slack []
   (let [body (get-ws-url)
+        self-map (:self body)
         ws-url (:url body)
         socket-stream @(aleph/websocket-client ws-url)
         chan (async/chan 10 (map #(json/parse-string % keyword)))]
-    ;; (m/connect socket-stream chan)
+    ;; Store info about the current bot user
+    (swap! self (fn [x] self-map))
+    ;; Return the socket
     socket-stream))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn add-emoji-response
   [emoji to-chan ts]
   (let [params {:channel to-chan
                 :timestamp ts
                 :name emoji}]
-    (make-slack-request-and-parse-body :reactions-add params)))</pre></td></tr><tr><td class="docs"><p>Posts a non-standard message over https; mostly for doing nonsense.</p>
+    (make-slack-request-and-parse-body :reactions-add params)))</pre></td></tr><tr><td class="docs"><p>Put a message on the global outbound channel for processing via the
+  WebSocket.</p>
+
+<p>Sending Messages</p>
+</td><td class="codes"><pre class="brush: clojure">(defn send-msg-on-channel!
+  [slack-channel text]
+  (go (&gt;! outbound-channel {:type &quot;message&quot; :channel slack-channel :text text})))</pre></td></tr><tr><td class="docs"><p>Posts a message over the https Slack web API.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn post-message
   [to-chan txt]
-  (let [cfg (:slack (blabs-config))
-        url (str (:api-url cfg) &quot;chat.postMessage&quot;)
-        token (:api-token (:slack (blabs-config)))
-        params {:token token
-                :channel to-chan
-                :text txt}]
-    (log/debug @(http/get url {:query-params params}))))</pre></td></tr><tr><td class="docs">
+  (let [bot-name (get-in (blabs-config) [:bot :bot-name])
+        params {:channel to-chan
+                :text txt
+                :username bot-name}
+        response (make-slack-request-and-parse-body :post-message params)]
+    (log/debug response)
+    response))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn open-direct-message-channel
+  [user-id]
+  (make-slack-request-and-parse-body :open-dm {:user user-id}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn close-direct-message-channel
+  [channel]
+  (make-slack-request-and-parse-body :close-dm {:channel channel}))</pre></td></tr><tr><td class="docs"><p>User actions</p>
 </td><td class="codes"><pre class="brush: clojure">(defn get-info-for-user
   [user-id]
   (make-slack-request-and-parse-body :user-info {:user user-id}))</pre></td></tr><tr><td class="docs">
@@ -3418,10 +3655,18 @@ regex in the match clauses -- you have to load and <code>def</code> them as symb
       (get-in body [:user :name])
       (log/error body))))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(def get-user-name (memoize fetch-user-name))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn get-info-for-user-name
+  [user-name]
+  (let [{member-info :members} (make-slack-request-and-parse-body :user-list)]
+    (first (filter (fn [m] (= user-name (:name m))) member-info))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn get-user-id-for-user-name
+  [user-name]
+  (let [user-info (get-info-for-user-name user-name)]
+    (:id user-info)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defn get-custom-emoji
   []
   (let [resp (make-slack-request-and-parse-body :emoji)]
-    (map name (keys (:emoji resp)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/gdeer81/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a><div id="floating-toc"><ul><li class="floating-toc-li" id="floating-toc_formidable-blabs.channels">formidable-blabs.channels</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.config">formidable-blabs.config</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.core">formidable-blabs.core</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.db">formidable-blabs.db</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.message-actions">formidable-blabs.message-actions</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.slack">formidable-blabs.slack</li></ul></div></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+    (map name (keys (:emoji resp)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/gdeer81/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a><div id="floating-toc"><ul><li class="floating-toc-li" id="floating-toc_formidable-blabs.channels">formidable-blabs.channels</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.config">formidable-blabs.config</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.core">formidable-blabs.core</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.db">formidable-blabs.db</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.message-actions.help">formidable-blabs.message-actions.help</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.message-actions">formidable-blabs.message-actions</li><li class="floating-toc-li" id="floating-toc_formidable-blabs.slack">formidable-blabs.slack</li></ul></div></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
 SyntaxHighlighter.all();
 
 // hackity hack
