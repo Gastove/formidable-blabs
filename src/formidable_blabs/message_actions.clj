@@ -342,20 +342,27 @@
   :emotes -- optional -- for emoting actions, the list of possible emotes
   :action-args -- optional -- additional arguments of all shapes and
     kinds, passed to the action.
+  :rate-limit -- optional -- we should wait at least this many seconds between
+    occurences of an actions; defaults to 0
+  :probability -- optional -- chance in 100 that an action occurs; defaults to 100
   }"
 
   ;; Dispatch fn:
   :action)
 
+;; `:random-emote-by-key' randomly selects an entry from its `:action-args',
+;; which should be a vector [] of candidates, like so:
+;; ["yes", "no", "maybe"]
 (defmethod dispatch-action :random-emote-by-key
   [{:keys [msg emotes action action-args throttle probability]
     :or {action-args ""
-         throttle 0
+         rate-limit 0
          probability 100}}]
   (log/debug "Dispatching a random emote!")
   (log/debug throttle)
-  (respond-with-random-thing msg action throttle probability action-args))
+  (respond-with-random-thing msg action rate-limit probability action-args))
 
+;; `:send-message' sends the message found in `:action-args'
 (defmethod dispatch-action :send-message
   [{:keys [msg emotes action-args] :or {:action-args ""}}]
   (send-msg-on-channel! (:channel msg) action-args))
