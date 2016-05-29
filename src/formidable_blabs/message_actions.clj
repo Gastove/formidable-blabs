@@ -359,7 +359,6 @@
          rate-limit 0
          probability 100}}]
   (log/debug "Dispatching a random emote!")
-  (log/debug throttle)
   (respond-with-random-thing msg action rate-limit probability action-args))
 
 ;; `:send-message' sends the message found in `:action-args'
