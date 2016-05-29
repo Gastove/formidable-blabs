@@ -354,7 +354,7 @@
 ;; which should be a vector [] of candidates, like so:
 ;; ["yes", "no", "maybe"]
 (defmethod dispatch-action :random-emote-by-key
-  [{:keys [msg emotes action action-args throttle probability]
+  [{:keys [msg emotes action action-args rate-limit probability]
     :or {action-args ""
          rate-limit 0
          probability 100}}]
