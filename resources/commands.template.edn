@@ -33,13 +33,16 @@
 ;;
 ;; Right now, Blabs supports these user-configurable actions:
 ;;
-;; - :random-emote-by-key
-;; - :send-message
-;; - :add-quote
-;; - :find-quote-for-name
-;; - :find-random-quote
-;; - :add-definition
-;; - :find-definition
+;; - :random-emote-by-key -- Sends a random selection from `:action-args',
+;;   which should be a vector like `["yes" "no" "maybe"]'. A common use for
+;;   this is gifs; note that gifs need to be specified as URLs hosted somewhere
+;;   on the internet. Blabs currently cannot serve local gifs.
+;; - :send-message -- Sends the message in `:action-args'.
+;; - :add-quote -- Add a quote to the quoting database
+;; - :find-quote-for-name -- Find a quote in the quote database by name.
+;; - :find-random-quote -- Get a random quote from the quoting database
+;; - :add-definition -- Add a definition to the definition database
+;; - :find-definition -- Retrieve a definition.
 ;;
 ;; *Note*: this file is loaded when blabs is built and run; blabs must be fully
 ;; restarted to pick up changes.
