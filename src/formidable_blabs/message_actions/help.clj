@@ -138,7 +138,7 @@
 (defn dispatch-help
   "Entry point for a current help session. Checks whether a user has provided a
   numeric response or a text response and tries to provide help accordingly."
-  [{message :msg}]
+  [[{message :msg}]]
   (let [{:keys [user text]} message
         help-channel (get-help-channel-for-user user)]
     (if (= text "done")
