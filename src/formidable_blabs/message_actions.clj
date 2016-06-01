@@ -130,24 +130,7 @@
           (with-out-str (pr {:names new-emojis})))
     new-emojis))
 
-(defn argenfloop
-  [{:keys [action action-args probability rate-limit] :or {:probability 100
-                                                           :rate-limit 0}}]
-  (let [last-replied (atom (time/date-time 0))
-        since-last-millis (* rate-limit 1000)
-        n (rand-int 99)
-        time? (time/after? (time/now)
-                           (time/plus @last-replied
-                                      (time/millis since-last-millis)))
 
-        chance? (< n probability)]
-    (cond
-      time? (do (apply action action-args)
-                (swap! last-replied (fn [x] (time/now))))
-      chance? (apply action action-args)
-      :else (log/debug "No action just yet."))))
-
-;; new throttling
 (def last-replied-map (atom {}))
 
 (defn time-to-reply?
