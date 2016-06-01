@@ -138,7 +138,7 @@
   (time/after? (time/now) (time/plus last-replied (time/millis throttle-millis))))
 
 (defn pick-and-send-random
-  [message possibilities]
+  [[message possibilities]]
   (let [selected (rand-nth possibilities)
         to-chan (:channel message)]
     (send-msg-on-channel! to-chan selected)))
