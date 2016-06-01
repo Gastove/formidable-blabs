@@ -84,7 +84,7 @@
   "Loads known emoji from file, adds in team custom emoji from the Slack
   API. Selects one at random, adds it as a response to a message. If the emoji
   name isn't recognized, purges it from the known emoji list."
-  [message emojis]
+  [[message emojis]]
   (log/debug "Responding with a random emoji")
   (let [emoji (rand-nth emojis)
         to-chan (:channel message)
