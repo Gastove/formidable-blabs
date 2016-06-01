@@ -151,7 +151,7 @@
 (defn set-last-done-and-do
   [emote-key action action-args]
   (swap! last-replied-map assoc emote-key (time/now))
-  (apply action action-args))
+  (action action-args))
 
 (defn respond
   "Takes a message, an action to perform on the message, arguments to that
@@ -160,12 +160,18 @@
   Note that time takes precedence over probability."
   [message action action-name action-args rate-limit probability]
   (let [last-replied-time (get @last-replied-map action-name (time/date-time 0))
-        throttle-millis (* 1000 rate-limit)]
-    (cond
-      (time-to-reply? last-replied-time throttle-millis) (set-last-done-and-do action-name action action-args)
-      (< (rand-int 99) probability) (apply action action-args)
-      :else (log/debug (str "It either isn't time or the probabilities"
-                            " didn't shake out, no action yet")))))
+        throttle-millis (* 1000 rate-limit)
+        time-to-reply (time-to-reply? last-replied-time throttle-millis)
+        probable (< (rand-int 99) probability)]
+    (log/debug (<< "Rate limit is: ~{rate-limit}; probability is ~{probability}"))
+    (log/debug (<< "Time to reply is: ~{time-to-reply}; probable is: ~{probable}"))
+    (if time-to-reply
+      (if probable
+        (cond
+          time-to-reply (set-last-done-and-do action-name action action-args)
+          probable (action action-args))
+        (log/debug (<< "The probabilities didn't shake out, not doing an ~{action}")))
+      (log/debug (<< "Not time yet, not doing an ~{action}")))))
 
 (defn respond-with-emoji
   [message emoji rate-limit probability]
@@ -429,7 +435,7 @@
 
 (defmacro make-matcher []
   (let [raw-clauses (config/commands)
-        emoji-args (:random-emoji raw-clauses)
+        emoji-args (:random-emoji-responder raw-clauses)
         clauses# (build-match-clauses raw-clauses)
         else-clause# (merge {:action :help-or-random-emoji-responder} emoji-args)]
     `(fn [username# text#]
