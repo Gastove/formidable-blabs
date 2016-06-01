@@ -72,7 +72,7 @@
                 "http://bukk.it/iwata.gif"],
   :help "!wat at the beginning of any line prints a random WAT gif."},
  :add-quote
- {:regex "(?s)!q[uote]* add [\\w\\s\\.-]+: .+",
+ {:regex "(?s)!q[uote]* add ([\\w\\s\\.-])+: (.+)",
   :action :add-quote,
   :help
   "Syntax: !q[uote] add name: quote\nAdds a quote to the quote database under a given name.\nExample: !q add Frank Zappa: I'm the slime"},
