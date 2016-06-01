@@ -440,7 +440,7 @@
 
 (defn build-match-clauses [match-specs]
   (reduce concat (for [[cmd spec] match-specs
-                       :when (not (some #{cmd} [:nomad/environment :nomad/hostname :nomad/instance :random-emoji]))
+                       :when (not (some #{cmd} [:nomad/environment :nomad/hostname :nomad/instance :random-emoji-responder]))
                        :let [clause (build-match-clause cmd spec)]]
                    clause)))
 
