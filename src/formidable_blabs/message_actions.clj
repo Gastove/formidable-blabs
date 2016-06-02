@@ -186,7 +186,7 @@
   (respond message pick-and-send-random :emote-key [message things] rate-limit probability))
 
 (defn maybe-respond
-  [action-name message emote-key rate-limit probability response]
+  [action-name message rate-limit probability response]
   (let [channel (:channel message)]
     (respond message (fn [[ch msg]] (send-msg-on-channel! ch msg)) action-name [channel response] rate-limit probability)))
 
@@ -356,8 +356,13 @@
 
 ;; `:send-message' sends the message found in `:action-args'
 (defmethod dispatch-action :send-message
-  [{:keys [msg emotes action-args] :or {:action-args ""}}]
+  [{:keys [msg action-args] :or {:action-args ""}}]
   (send-msg-on-channel! (:channel msg) action-args))
+
+;; :maybe-send-message respects rate-limiting and probabilities
+(defmethod dispatch-action :maybe-send-message
+  [{:keys [msg action-args rate-limit probability] :or {:action-args ""}}]
+  (maybe-respond :maybe-send-message msg rate-limit probability action-args))
 
 ;; Quote actions
 (defmethod dispatch-action :add-quote
