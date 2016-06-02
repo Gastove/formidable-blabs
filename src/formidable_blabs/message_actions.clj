@@ -185,6 +185,10 @@
   [message emote-key rate-limit probability things]
   (respond message pick-and-send-random :emote-key [message things] rate-limit probability))
 
+(defn maybe-respond
+  [action-name message emote-key rate-limit probability response]
+  (let [channel (:channel message)]
+    (respond message (fn [[ch msg]] (send-msg-on-channel! ch msg)) action-name [channel response] rate-limit probability)))
 
 (defn load-emoji-on-file
   []
