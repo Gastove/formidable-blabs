@@ -39,10 +39,10 @@
   [topics]
   (into {} (map-indexed (fn [idx k] [idx k]) topics)))
 
-(def commands-by-index (-> commands-map
-                           (make-topic-list)
-                           (make-indexed-topics)
-                           (sort)))
+(def commands-by-index (into {} (-> commands-map
+                                    (make-topic-list)
+                                    (make-indexed-topics)
+                                    (sort))))
 
 ;; Formatting
 (defn format-text-as-command-name
@@ -114,6 +114,8 @@
 (defn load-help-by-key
   "Returns either the help text for a command, or a polite apology."
   [k]
+  (log/info k)
+  (log/info (get-in commands-map [:add-quote :help]))
   (if-let [help-text (get-in commands-map [k :help])]
     help-text
     (<< "I'm sorry, I don't know how to help you with \"~{k}\". Try again?'")))
@@ -131,9 +133,10 @@
   "End the help session for a user by removing that users ID and dm-channel from
   the help-channels atom"
   [user-id]
+  (log/debug (<< "Ending help for ~{user-id}"))
   (let [help-channel (get-help-channel-for-user user-id)]
     (slack/send-msg-on-channel! help-channel "Okie dokie!")
-    (swap! help-channel dissoc user-id)))
+    (swap! help-channels #(dissoc % user-id))))
 
 (defn dispatch-help
   "Entry point for a current help session. Checks whether a user has provided a
