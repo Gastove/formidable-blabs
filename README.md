@@ -10,7 +10,7 @@ if you're in a forking kind of mood. The one thing I'm _not_ is a library.
 ## Dependencies
 
 Very few of 'em! You need: a recent installation of
-[Leiningen](http://leiningen.org/); sqlite3. _Boom_. 
+[Leiningen](http://leiningen.org/); sqlite3. _Boom_.
 
 ## Setup and Run
 
@@ -21,7 +21,10 @@ Blabs is pretty easy to configure. Do like so:
 2. Clone this repo. `cd` in to `formidable_blabs/resources`.
 3. Make a copy of the file `local.edn.template`; call it `local.edn`.
 4. Replace the block `<REPLACE ME>` with your Slack token.
-5. Now `cd` back to the project root and run:
+5. Copy `commands.template.edn` to `commands.edn`; this is now where you
+   configure blabs. (Protip: this can also be a symlink to a config file under
+   version control elsewhere.)
+6. Now `cd` back to the project root and run:
 
 ```bash
 # One-time setup
