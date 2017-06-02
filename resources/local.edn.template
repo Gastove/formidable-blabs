@@ -1,1 +1,1 @@
-{:slack-api-token <REPLACE ME>}
+{:slack {:api-token <REPLACE ME>}}
