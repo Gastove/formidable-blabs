@@ -98,7 +98,7 @@
                        (process-outbound outbound-channel socket)]))
       ;; A `NullPointerException` occurs when we can't connect to Slack
       (catch java.lang.NullPointerException npe
-        (log/error (<< "Couldn't re-open websocket, retrying with ~(/ backoff 1000) milliseconds of backoff")))
+        (log/error (<< "Couldn't re-open websocket, retrying with ~(/ backoff 1000) seconds of backoff")))
       ;; `IOException` is thrown when we can't read from a websocket
       (catch java.io.IOException ioe
         (log/error (<< "Caught IOException; couldn't read from websocket. Backing off ~(/ backoff 1000) seconds, then reconnecting")))
