@@ -41,8 +41,7 @@
 
 (def commands-by-index (into {} (-> commands-map
                                     (make-topic-list)
-                                    (make-indexed-topics)
-                                    (sort))))
+                                    (make-indexed-topics))))
 
 ;; Formatting
 (defn format-text-as-command-name
@@ -65,7 +64,7 @@
   "Takes the list of key names returned by `make-topic-list'.
   Returns a string of topics formatted as `[Index of topic name] topic name'"
   [topic-list]
-  (let [pieces (for [[idx cmd] topic-list
+  (let [pieces (for [[idx cmd] (sort-by key topic-list)
                      :let [cmd-name (format-command-key-as-text cmd)]]
                  (<< "[~{idx}] ~{cmd-name}"))]
     (str/join \newline pieces)))
