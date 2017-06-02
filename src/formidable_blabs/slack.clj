@@ -2,11 +2,11 @@
   (:require [aleph.http :as aleph]
             [cheshire.core :as json]
             [clojure.core.async :as async :refer [>! go]]
-            [formidable-blabs
-             [channels :refer [outbound-channel]]
-             [config :refer [blabs-config]]]
+            [formidable-blabs.channels :refer [outbound-channel]]
+            [formidable-blabs.config :refer [blabs-config]]
             [org.httpkit.client :as http]
-            [taoensso.timbre :as log]))
+            [taoensso.timbre :as log])
+  (:import java.lang.RuntimeException))
 
 (def self (atom ""))
 
@@ -26,7 +26,12 @@
      (json/parse-string (:body resp) keyword))))
 
 (defn get-ws-url []
-  (make-slack-request-and-parse-body :rtm-start))
+  (let [resp (make-slack-request-and-parse-body :rtm-start)]
+    (if (:ok resp)
+      resp
+      (do
+        (log/error "Couldn't connect to slack! Got error: " (:error resp))
+        (throw (RuntimeException. "Couldn't open Slack websocket!"))))))
 
 (defn connect-to-slack []
   (let [body (get-ws-url)
